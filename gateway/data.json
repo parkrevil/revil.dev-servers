@@ -1,0 +1,52 @@
+[
+  {
+    "title": "Amphisbaena",
+    "description": "A serpent with two heads, one at either end",
+    "content": "https://bestiary.ca/beastimage/img100489.jpg"
+  },
+  {
+    "title": "Monocerus",
+    "description": "A fierce beast with a single long horn",
+    "content": "https://bestiary.ca/beastimage/img1012.jpg"
+  },
+  {
+    "title": "Manticore",
+    "description": "A composite beast with a man's face, a lion's body, and the stinger of a scorpion",
+    "content": "https://bestiary.ca/beastimage/img101860.jpg"
+  },
+  {
+    "title": "Mandrake",
+    "description": "A plant with human-shaped roots, that shrieks when it is pulled from the earth",
+    "content": "https://bestiary.ca/beastimage/img4521.jpg"
+  },
+  {
+    "title": "Parandrus",
+    "description": "A beast that can conceal itself by changing its appearance",
+    "content": "https://bestiary.ca/beastimage/img184.jpg"
+  },
+  {
+    "title": "Peridexion Tree",
+    "description": "A tree in India that attracts doves and repels dragons",
+    "content": "https://bestiary.ca/beastimage/img2140.jpg"
+  },
+  {
+    "title": "Scitalis",
+    "description": "A serpent with such a marvellous appearance that it stuns the viewer",
+    "content": "https://bestiary.ca/beastimage/img102075.jpg"
+  },
+  {
+    "title": "Sea-pig",
+    "description": "Sea-pigs dig up the ground under water",
+    "content": "https://bestiary.ca/beastimage/img418.jpg"
+  },
+  {
+    "title": "Hippocampus",
+    "description": "A beast with the front half of a horse and tail of a fish or serpent",
+    "content": "https://bestiary.ca/beastimage/img101258.jpg"
+  },
+  {
+    "title": "Yale",
+    "description": "A beast with flexible horns that it can move at will",
+    "content": "https://bestiary.ca/beastimage/img4955.jpg"
+  }
+]
