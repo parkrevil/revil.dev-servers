@@ -55,18 +55,57 @@ func main() {
 		},
 	})
 
-	gqlFields := gql.Fields{
-		"wikiList": &gql.Field{
-			Type:        gql.NewList(wikiType),
-			Description: "List of wiki",
-			Resolve: func(p gql.ResolveParams) (interface{}, error) {
-				return wikis, nil
+	rootQuery := gql.NewObject(gql.ObjectConfig{
+		Name: "RootQuery",
+		Fields: gql.Fields{
+			"wikiList": &gql.Field{
+				Type:        gql.NewList(wikiType),
+				Description: "List of wiki",
+				Resolve: func(p gql.ResolveParams) (interface{}, error) {
+					return wikis, nil
+				},
 			},
 		},
+	})
+	rootMutation := gql.NewObject(gql.ObjectConfig{
+		Name: "RootMutation",
+		Fields: gql.Fields{
+			"addWiki": &gql.Field{
+				Type:        gql.Boolean, // the return type for this field
+				Description: "add a new wiki",
+				Args: gql.FieldConfigArgument{
+					"title": &gql.ArgumentConfig{
+						Type: gql.NewNonNull(gql.String),
+					},
+					"description": &gql.ArgumentConfig{
+						Type: gql.NewNonNull(gql.String),
+					},
+					"content": &gql.ArgumentConfig{
+						Type: gql.NewNonNull(gql.String),
+					},
+				},
+				Resolve: func(params gql.ResolveParams) (interface{}, error) {
+					title, _ := params.Args["name"].(string)
+					description, _ := params.Args["description"].(string)
+					content, _ := params.Args["imageUrl"].(string)
+
+					wiki := Wiki{
+						Title:       title,
+						Description: description,
+						Content:     content,
+					}
+					wikis = append(wikis, wiki)
+
+					return true, nil
+				},
+			},
+		},
+	})
+	schemaConfig := gql.SchemaConfig{
+		Query:    rootQuery,
+		Mutation: rootMutation,
 	}
-	gqlRootQuery := gql.ObjectConfig{Name: "RootQuery", Fields: gqlFields}
-	gqlSchemaConfig := gql.SchemaConfig{Query: gql.NewObject(gqlRootQuery)}
-	gqlSchema, err := gql.NewSchema(gqlSchemaConfig)
+	schema, err := gql.NewSchema(schemaConfig)
 
 	if err != nil {
 		log.Fatalf("failed to create new schema, error: %v", err)
@@ -83,7 +122,7 @@ func main() {
 
 	server.Use(cors.New(cors.Config{
 		AllowOrigins:     "http://localhost:10000",
-		AllowMethods:     "HEAD,POST",
+		AllowMethods:     "POST,GET",
 		AllowCredentials: true,
 	}))
 
@@ -96,7 +135,7 @@ func main() {
 
 		result := gql.Do(gql.Params{
 			Context:        ctx.Context(),
-			Schema:         gqlSchema,
+			Schema:         schema,
 			RequestString:  body.Query,
 			VariableValues: body.Variables,
 			OperationName:  body.Operation,
@@ -104,6 +143,8 @@ func main() {
 
 		return ctx.JSON(result)
 	})
+
+	server.Static("/sandbox", "./public/sandbox.html")
 
 	if err := server.Listen(":20000"); err != nil {
 		panic(err)
