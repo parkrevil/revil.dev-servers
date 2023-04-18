@@ -20,7 +20,7 @@ func main() {
 
 	server := grpc.NewServer()
 
-	pb.RegisterArticleServiceServer(server, &ArticleService{})
+	pb.RegisterArticleServiceServer(server, NewArticleService())
 	pb.RegisterArticlePageServiceServer(server, &ArticlePageService{})
 
 	if err := server.Serve(l); err != nil {

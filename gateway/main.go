@@ -1,8 +1,8 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -10,7 +10,11 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/golang/protobuf/ptypes/empty"
 	gql "github.com/graphql-go/graphql"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	pb "revil.dev-servers/libs/services/article"
 )
 
 type GqlBody struct {
@@ -19,60 +23,55 @@ type GqlBody struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
-type Wiki struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Content     string `json:"content"`
-}
-
 func main() {
-	var wikis []Wiki
-
-	content, err := ioutil.ReadFile("./data.json")
-
+	articleServiceConn, err := grpc.Dial("localhost:20001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Print("Error:", err)
+		log.Fatalf("failed to init article service connection: %v", err)
 	}
+	defer articleServiceConn.Close()
+	articleService := pb.NewArticleServiceClient(articleServiceConn)
 
-	err = json.Unmarshal(content, &wikis)
-
-	if err != nil {
-		log.Print("Error:", err)
-	}
-
-	wikiType := gql.NewObject(gql.ObjectConfig{
-		Name: "Wiki",
+	articleType := gql.NewObject(gql.ObjectConfig{
+		Name: "Article",
 		Fields: gql.Fields{
+			"id": &gql.Field{
+				Type: gql.String,
+			},
 			"title": &gql.Field{
 				Type: gql.String,
 			},
 			"description": &gql.Field{
 				Type: gql.String,
 			},
-			"content": &gql.Field{
-				Type: gql.String,
-			},
 		},
 	})
 
-	rootQuery := gql.NewObject(gql.ObjectConfig{
-		Name: "RootQuery",
+	getArticlesQuery := gql.NewObject(gql.ObjectConfig{
+		Name: "GetArticles",
 		Fields: gql.Fields{
-			"wikiList": &gql.Field{
-				Type:        gql.NewList(wikiType),
-				Description: "List of wiki",
+			"articles": &gql.Field{
+				Type:        gql.NewList(articleType),
+				Description: "Get articles",
 				Resolve: func(p gql.ResolveParams) (interface{}, error) {
-					return wikis, nil
+					ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+					defer cancel()
+
+					articles, err := articleService.GetArticles(ctx, &empty.Empty{})
+					if err != nil {
+						log.Fatalf("GetArticles failed: %v", err)
+					}
+
+					return articles.Articles, nil
 				},
 			},
 		},
 	})
-	rootMutation := gql.NewObject(gql.ObjectConfig{
+	/* 	rootMutation := gql.NewObject(gql.ObjectConfig{
 		Name: "RootMutation",
 		Fields: gql.Fields{
-			"addWiki": &gql.Field{
-				Type:        gql.Boolean, // the return type for this field
-				Description: "add a new wiki",
+			"createArticle": &gql.Field{
+				Type:        gql.Boolean,
+				Description: "Create a new article",
 				Args: gql.FieldConfigArgument{
 					"title": &gql.ArgumentConfig{
 						Type: gql.NewNonNull(gql.String),
@@ -80,30 +79,27 @@ func main() {
 					"description": &gql.ArgumentConfig{
 						Type: gql.NewNonNull(gql.String),
 					},
-					"content": &gql.ArgumentConfig{
-						Type: gql.NewNonNull(gql.String),
-					},
 				},
 				Resolve: func(params gql.ResolveParams) (interface{}, error) {
-					title, _ := params.Args["name"].(string)
+					id, _ := params.Args["id"].(string)
+					title, _ := params.Args["title"].(string)
 					description, _ := params.Args["description"].(string)
-					content, _ := params.Args["imageUrl"].(string)
 
-					wiki := Wiki{
+					article := Article{
+						Id:          id,
 						Title:       title,
 						Description: description,
-						Content:     content,
 					}
-					wikis = append(wikis, wiki)
+					articles = append(articles, article)
 
 					return true, nil
 				},
 			},
 		},
-	})
+	}) */
 	schemaConfig := gql.SchemaConfig{
-		Query:    rootQuery,
-		Mutation: rootMutation,
+		Query: getArticlesQuery,
+		//Mutation: rootMutation,
 	}
 	schema, err := gql.NewSchema(schemaConfig)
 

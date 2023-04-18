@@ -1,11 +1,10 @@
-
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 
 package article;
 
-option go_package = "revil.dev-servers/libs/services/article";
+option go_package = "/article";
 
 service ArticlePageService {
   rpc addPage(AddPageParam) returns (PageId);
