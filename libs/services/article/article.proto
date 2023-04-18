@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package article;
+
+option go_package = "revil.dev-servers/libs/services/article";
+
+service ArticleService {
+  rpc createArticle(CreateArticleParam) returns (ArticleId);
+  rpc deleteArticle(ArticleId) returns (google.protobuf.Empty);
+}
+
+message CreateArticleParam {
+  string title = 1;
+}
+
+message ArticleId {
+  string value = 1; 
+}
