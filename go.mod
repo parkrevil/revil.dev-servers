@@ -3,6 +3,7 @@ module revil.dev-servers
 go 1.20
 
 require (
+	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.44.0
 	github.com/golang/protobuf v1.5.3
 	github.com/graphql-go/graphql v0.8.1

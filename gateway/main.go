@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/golang/protobuf/ptypes/empty"
 	gql "github.com/graphql-go/graphql"
@@ -115,6 +116,10 @@ func main() {
 		JSONEncoder:       json.Marshal,
 		JSONDecoder:       json.Unmarshal,
 	})
+
+	server.Use(compress.New(compress.Config{
+		Level: compress.LevelBestCompression,
+	}))
 
 	server.Use(cors.New(cors.Config{
 		AllowOrigins:     "http://localhost:10000",
