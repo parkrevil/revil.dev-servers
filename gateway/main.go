@@ -7,10 +7,6 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/goccy/go-json"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/compress"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/golang/protobuf/ptypes/empty"
 	gql "github.com/graphql-go/graphql"
 	"google.golang.org/grpc"
@@ -25,13 +21,20 @@ type GqlBody struct {
 }
 
 func main() {
-	articleServiceConn, err := grpc.Dial("localhost:20001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	app := NewApp()
+	defer app.Shutdown()
+
+	if err := app.Start(); err != nil {
+		panic(err)
+	}
+
+/* 	articleServiceConn, err := grpc.Dial("localhost:20001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to init article service connection: %v", err)
 	}
 	defer articleServiceConn.Close()
 	articleService := pb.NewArticleServiceClient(articleServiceConn)
-
+ */
 	articleType := gql.NewObject(gql.ObjectConfig{
 		Name: "Article",
 		Fields: gql.Fields{
@@ -108,54 +111,11 @@ func main() {
 		log.Fatalf("failed to create new schema, error: %v", err)
 	}
 
-	server := fiber.New(fiber.Config{
-		AppName:           "revil.dev API Server",
-		CaseSensitive:     true,
-		EnablePrintRoutes: true,
-		Immutable:         true,
-		JSONEncoder:       json.Marshal,
-		JSONDecoder:       json.Unmarshal,
-	})
-
-	server.Use(compress.New(compress.Config{
-		Level: compress.LevelBestCompression,
-	}))
-
-	server.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:10000",
-		AllowMethods:     "POST,GET",
-		AllowCredentials: true,
-	}))
-
-	server.Post("/gql", func(ctx *fiber.Ctx) error {
-		body := new(GqlBody)
-
-		if err := ctx.BodyParser(body); err != nil {
-			return err
-		}
-
-		result := gql.Do(gql.Params{
-			Context:        ctx.Context(),
-			Schema:         schema,
-			RequestString:  body.Query,
-			VariableValues: body.Variables,
-			OperationName:  body.Operation,
-		})
-
-		return ctx.JSON(result)
-	})
-
-	server.Static("/sandbox", "./public/sandbox.html")
-
-	if err := server.Listen(":20000"); err != nil {
-		panic(err)
-	}
-
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 
-	if err := server.ShutdownWithTimeout(2 * time.Second); err != nil {
+	if err := app.Shutdown(); err != nil {
 		panic(err)
 	}
 }
