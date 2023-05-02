@@ -1,0 +1,13 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Auth {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type Query {
+  signWithEmail(email: String!, password: String!): Auth!
+  signInWIthGoogle(accessToken: String!): Auth!
+}
