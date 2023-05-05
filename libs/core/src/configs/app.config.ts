@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 
-import { AppConfig } from './interfaces';
 import { Env } from '../enums';
+import { AppConfig } from './interfaces';
 
 export default registerAs(
   'app',

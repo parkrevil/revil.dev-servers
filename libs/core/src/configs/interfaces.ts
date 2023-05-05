@@ -9,8 +9,8 @@ interface BaseServerConfig {
   port: number;
 }
 
-export interface ApiGatewayConfig extends BaseServerConfig {}
+export type ApiGatewayConfig = BaseServerConfig;
 
-export interface UserConfig extends BaseServerConfig {}
+export type UserConfig = BaseServerConfig;
 
-export interface AuthConfig extends BaseServerConfig {}
+export type AuthConfig = BaseServerConfig;

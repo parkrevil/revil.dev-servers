@@ -1,6 +1,7 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { Auth } from './models';
+
 import { SignInWithEmailArgs, SignInWithGoogleArgs } from './dtos';
+import { Auth } from './models';
 
 @Resolver(() => Auth)
 export class AuthResolver {
