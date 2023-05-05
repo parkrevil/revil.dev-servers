@@ -14,3 +14,7 @@ export type ApiGatewayConfig = BaseServerConfig;
 export type UserConfig = BaseServerConfig;
 
 export type AuthConfig = BaseServerConfig;
+
+export interface DatabasesConfig {
+  mongodbUri: string;
+}
