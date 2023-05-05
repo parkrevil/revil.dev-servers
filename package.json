@@ -8,6 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+    "start": "concurrently \"npm run start:api-gateway\" \"npm run start:auth\" \"npm run start:user\"",
     "start:api-gateway": "nest start api-gateway --watch",
     "start:auth": "nest start auth --watch",
     "start:user": "nest start user --watch",
@@ -23,6 +24,7 @@
     "@apollo/server": "^4.7.0",
     "@nestjs/apollo": "^11.0.5",
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
     "@nestjs/graphql": "^11.0.5",
     "@nestjs/platform-express": "^9.0.0",
@@ -40,6 +42,7 @@
     "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
+    "concurrently": "^8.0.1",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -70,7 +73,12 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
-    ]
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
+      "^@app/core(|/.*)$": "<rootDir>/libs/core/src/$1"
+    }
   }
 }
