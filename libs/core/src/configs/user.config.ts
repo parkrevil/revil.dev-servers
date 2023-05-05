@@ -7,5 +7,6 @@ export default registerAs(
   (): UserConfig => ({
     host: process.env.USER_HOST,
     port: parseInt(process.env.USER_PORT),
+    redisDb: parseInt(process.env.USER_REDIS_DB),
   }),
 );

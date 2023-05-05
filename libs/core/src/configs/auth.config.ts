@@ -7,5 +7,6 @@ export default registerAs(
   (): AuthConfig => ({
     host: process.env.AUTH_HOST,
     port: parseInt(process.env.AUTH_PORT),
+    redisDb: parseInt(process.env.AUTH_REDIS_DB),
   }),
 );

@@ -7,5 +7,6 @@ export default registerAs(
   (): ApiGatewayConfig => ({
     host: process.env.API_GATEWAY_HOST,
     port: parseInt(process.env.API_GATEWAY_PORT),
+    redisDb: parseInt(process.env.API_GATEWAY_REDIS_DB),
   }),
 );

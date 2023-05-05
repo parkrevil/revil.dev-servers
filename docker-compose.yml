@@ -29,7 +29,7 @@ services:
 
   revil.dev_redis:
     container_name: revil.dev_redis
-    image: redis:latest
+    image: redis
     restart: always
     ports:
       - 6379:6379
