@@ -37,3 +37,4 @@ lerna-debug.log*
 .env
 .container-volumes/mongodb
 google
+documentation
