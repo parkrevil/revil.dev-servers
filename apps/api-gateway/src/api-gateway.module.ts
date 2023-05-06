@@ -5,7 +5,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
-import { MongooseModule } from '@nestjs/mongoose';
 import { redisStore } from 'cache-manager-redis-yet';
 import { join } from 'path';
 import type { RedisClientOptions } from 'redis';
@@ -18,12 +17,6 @@ import { AuthModule } from './auth';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'apps/api-gateway/src/schema.gql'),
       playground: true,
-    }),
-    MongooseModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<DatabasesConfig>('databases').mongodbUri,
-      }),
-      inject: [ConfigService],
     }),
     CacheModule.registerAsync<RedisClientOptions>({
       useFactory: async (configService: ConfigService) => {
