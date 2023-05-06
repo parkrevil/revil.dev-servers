@@ -9,6 +9,10 @@ interface BaseServerConfig {
   port: number;
 }
 
+interface GrpcServerConfig {
+  url: string;
+}
+
 interface RedisConfig {
   host: string;
   port: number;
@@ -23,7 +27,7 @@ export type ApiGatewayConfig = BaseServerConfig & RedisDatabaseConfig;
 
 export type UserConfig = BaseServerConfig & RedisDatabaseConfig;
 
-export type AuthConfig = BaseServerConfig & RedisDatabaseConfig;
+export type AuthConfig = GrpcServerConfig & RedisDatabaseConfig;
 
 export interface DatabasesConfig {
   mongodbUri: string;

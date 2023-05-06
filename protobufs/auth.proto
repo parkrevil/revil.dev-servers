@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package auth;
+
+import "google/protobuf/wrappers.proto";
+
+service AuthService {
+  rpc signIn (SignInParams) returns (AuthTokens) {}
+  rpc verifyAccessToken (VerifyAccessTokenParams) returns (google.protobuf.BoolValue) {}
+}
+
+message SignInParams {
+  string username = 1;
+  string password = 2;
+}
+
+message VerifyAccessTokenParams {
+  string accessToken = 1;
+}
+
+message AuthTokens {
+  string accessToken = 1;
+  string refreshToken = 2;
+}

@@ -2,12 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Auth {
+type AuthTokens {
   accessToken: String!
   refreshToken: String!
 }
 
 type Query {
-  signWithEmail(email: String!, password: String!): Auth!
-  signInWIthGoogle(accessToken: String!): Auth!
+  signInWithEmail(email: String!, password: String!): AuthTokens!
+  signInWithGoogle(accessToken: String!): AuthTokens!
 }

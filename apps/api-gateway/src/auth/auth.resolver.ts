@@ -1,25 +1,35 @@
+import { Inject, OnModuleInit } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
+import { ClientGrpc } from '@nestjs/microservices';
+import { AuthServiceClient } from 'protobufs/auth';
+import { Observable } from 'rxjs';
 
 import { SignInWithEmailArgs, SignInWithGoogleArgs } from './dtos';
-import { Auth } from './models';
+import { AuthTokens } from './models';
 
-@Resolver(() => Auth)
-export class AuthResolver {
-  @Query(() => Auth)
-  signWithEmail(@Args() args: SignInWithEmailArgs): Auth {
-    const res = new Auth();
-    res.accessToken = args.email;
-    res.refreshToken = args.password;
+@Resolver()
+export class AuthResolver implements OnModuleInit {
+  private authServiceClient: AuthServiceClient;
 
-    return res;
+  constructor(@Inject('AUTH_GRPC_PACKAGE') private authGrpcClient: ClientGrpc) {}
+
+  onModuleInit(): void {
+    this.authServiceClient = this.authGrpcClient.getService<AuthServiceClient>('AuthService');
   }
 
-  @Query(() => Auth)
-  signInWIthGoogle(@Args() args: SignInWithGoogleArgs): Auth {
-    const res = new Auth();
-    res.accessToken = 'a';
-    res.refreshToken = 'b';
+  @Query(() => AuthTokens)
+  signInWithEmail(@Args() args: SignInWithEmailArgs): Observable<AuthTokens> {
+    return this.authServiceClient.signIn({
+      username: 'username',
+      password: 'password',
+    });
+  }
 
-    return res;
+  @Query(() => AuthTokens)
+  signInWithGoogle(@Args() args: SignInWithGoogleArgs): Observable<AuthTokens> {
+    return this.authServiceClient.signIn({
+      username: 'username',
+      password: 'password',
+    });
   }
 }

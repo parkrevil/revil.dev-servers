@@ -19,16 +19,21 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/revil.dev-servers/test/jest-e2e.json",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "proto": "chokidar \"protobufs/**/*.proto\" -c \"npm run proto:generate\"",
+    "proto:generate": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto protobufs/*.proto --ts_proto_out=. --ts_proto_opt=addGrpcMetadata=true --ts_proto_opt=nestJs=true --ts_proto_opt=addGrpcMetadata=true"
   },
   "dependencies": {
     "@apollo/server": "^4.7.0",
+    "@grpc/grpc-js": "^1.8.14",
+    "@grpc/proto-loader": "^0.7.7",
     "@nestjs/apollo": "^11.0.5",
     "@nestjs/cache-manager": "^1.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
     "@nestjs/graphql": "^11.0.5",
+    "@nestjs/microservices": "^9.4.0",
     "@nestjs/mongoose": "^9.2.2",
     "@nestjs/platform-express": "^9.0.0",
     "cache-manager-redis-yet": "^4.1.1",
@@ -48,6 +53,7 @@
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "cache-manager-redis-store": "^3.0.1",
+    "chokidar-cli": "^3.0.0",
     "concurrently": "^8.0.1",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
@@ -63,6 +69,7 @@
     "ts-jest": "29.0.5",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
+    "ts-proto": "^1.147.1",
     "tsconfig-paths": "4.2.0",
     "typescript": "^4.7.4"
   },
@@ -93,7 +100,6 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
       "^@app/core(|/.*)$": "<rootDir>/libs/core/src/$1"
     }
   }

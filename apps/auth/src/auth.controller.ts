@@ -1,13 +1,31 @@
-import { Controller, Get } from '@nestjs/common';
+import { Metadata } from '@grpc/grpc-js';
+import { Controller } from '@nestjs/common';
+import { BoolValue } from 'google/protobuf/wrappers';
+import {
+  AuthServiceController,
+  AuthServiceControllerMethods,
+  AuthTokens,
+  SignInParams,
+  VerifyAccessTokenParams,
+} from 'protobufs/auth';
 
 import { AuthService } from './auth.service';
 
 @Controller()
-export class AuthController {
+@AuthServiceControllerMethods()
+export class AuthController implements AuthServiceController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get()
-  getHello(): string {
-    return this.authService.getHello();
+  signIn(request: SignInParams, metadata?: Metadata): AuthTokens {
+    return {
+      accessToken: 'a',
+      refreshToken: 'b',
+    };
+  }
+
+  verifyAccessToken(request: VerifyAccessTokenParams, metadata?: Metadata): BoolValue {
+    return {
+      value: true,
+    };
   }
 }
