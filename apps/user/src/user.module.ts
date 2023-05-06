@@ -1,5 +1,5 @@
 import { CoreModule } from '@app/core';
-import { ApiGatewayConfig, DatabasesConfig, UserConfig } from '@app/core/configs';
+import { DatabasesConfig, UserConfig } from '@app/core/configs';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
