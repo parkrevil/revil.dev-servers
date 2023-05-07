@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 
-import { AuthConfig } from './interfaces';
+import { AuthConfig } from './types';
 
 export default registerAs(
   'auth',

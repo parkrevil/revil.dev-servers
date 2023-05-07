@@ -1,12 +1,11 @@
 import { registerAs } from '@nestjs/config';
 
-import { UserConfig } from './interfaces';
+import { UserConfig } from './types';
 
 export default registerAs(
   'user',
   (): UserConfig => ({
-    host: process.env.USER_HOST,
-    port: parseInt(process.env.USER_PORT),
+    url: process.env.USER_URL,
     redisDb: parseInt(process.env.USER_REDIS_DB),
   }),
 );

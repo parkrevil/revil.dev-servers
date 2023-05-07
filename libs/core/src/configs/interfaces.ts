@@ -4,12 +4,7 @@ export interface AppConfig {
   env: Env;
 }
 
-interface BaseServerConfig {
-  host: string;
-  port: number;
-}
-
-interface GrpcServerConfig {
+export interface GrpcServerConfig {
   url: string;
 }
 
@@ -19,15 +14,14 @@ interface RedisConfig {
   password: string;
 }
 
-interface RedisDatabaseConfig {
+export interface RedisDatabaseConfig {
   redisDb: number;
 }
 
-export type ApiGatewayConfig = BaseServerConfig & RedisDatabaseConfig;
-
-export type UserConfig = BaseServerConfig & RedisDatabaseConfig;
-
-export type AuthConfig = GrpcServerConfig & RedisDatabaseConfig;
+export interface ApiGatewayConfig extends RedisDatabaseConfig {
+  host: string;
+  port: number;
+}
 
 export interface DatabasesConfig {
   mongodbUri: string;

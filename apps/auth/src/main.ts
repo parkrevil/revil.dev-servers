@@ -8,14 +8,14 @@ import { AuthModule } from './auth.module';
 
 async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(AuthModule);
-  const authConfig = appContext.get(ConfigService).get<AuthConfig>('auth');
+  const config = appContext.get(ConfigService).get<AuthConfig>('auth');
 
   await appContext.close();
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AuthModule, {
     transport: Transport.GRPC,
     options: {
-      url: authConfig.url,
+      url: config.url,
       package: 'auth',
       protoPath: join(process.cwd(), 'protobufs/auth.proto'),
     },

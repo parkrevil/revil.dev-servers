@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+  rpc createUserWithUsername (createUserWithUsernameParams) returns (UserId) {}
+}
+
+message UserId {
+  string id = 1;
+}
+
+message createUserWithUsernameParams {
+  string username = 1;
+  string password = 2;
+}

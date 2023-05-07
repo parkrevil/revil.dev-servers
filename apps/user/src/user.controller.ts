@@ -1,13 +1,22 @@
+import { Metadata } from '@grpc/grpc-js';
 import { Controller, Get } from '@nestjs/common';
+import {
+  createUserWithUsernameParams,
+  UserId,
+  UserServiceController,
+  UserServiceControllerMethods,
+} from 'protobufs/user';
 
 import { UserService } from './user.service';
 
 @Controller()
-export class UserController {
+@UserServiceControllerMethods()
+export class UserController implements UserServiceController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
-  getHello(): string {
-    return this.userService.getHello();
+  createUserWithUsername(request: createUserWithUsernameParams, metadata?: Metadata): UserId {
+    return {
+      id: 'test',
+    };
   }
 }
