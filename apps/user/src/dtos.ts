@@ -1,12 +1,12 @@
 import { IsEmail, IsString } from 'class-validator';
-import { CreateUserWithUsernameParams } from 'protobufs/user';
+import { CreateWithUsernameParams } from 'protobufs/user';
 
-class CreateUserDto {
+class CreateDto {
   @IsString()
   nickname: string;
 }
 
-export class CreateUserWithUsernameDto extends CreateUserDto implements CreateUserWithUsernameParams {
+export class CreateWithUsernameDto extends CreateDto implements CreateWithUsernameParams {
   @IsEmail()
   username: string;
 

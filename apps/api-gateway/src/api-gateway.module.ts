@@ -10,6 +10,7 @@ import { join } from 'path';
 import type { RedisClientOptions } from 'redis';
 
 import { AuthModule } from './auth';
+import { UserModule } from './user';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AuthModule } from './auth';
     }),
     CoreModule,
     AuthModule,
+    UserModule,
   ],
 })
 export class ApiGatewayModule {}

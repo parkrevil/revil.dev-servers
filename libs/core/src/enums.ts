@@ -5,4 +5,5 @@ export enum Env {
 
 export enum GrpcServer {
   Auth = 'auth',
+  User = 'user',
 }

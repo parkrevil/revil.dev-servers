@@ -1,6 +1,7 @@
 import { File } from '@app/core/mongoose/schemas';
-import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { DateTime } from 'luxon';
+import moment, { Moment } from 'moment';
 import { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
@@ -15,7 +16,7 @@ export class User {
   @Prop({
     required: true,
   })
-  password: number;
+  password: string;
 
   @Prop({
     required: true,
@@ -31,12 +32,14 @@ export class User {
   @Prop({
     type: Date,
     required: true,
+    default: DateTime.local(),
   })
   createdAt: DateTime;
 
   @Prop({
     type: Date,
     required: true,
+    default: DateTime.local(),
   })
   updatedAt: DateTime;
 }

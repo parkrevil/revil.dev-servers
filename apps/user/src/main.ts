@@ -22,15 +22,19 @@ async function bootstrap() {
     },
   });
 
-  app
+  await app
     .useGlobalInterceptors(
       new ClassSerializerInterceptor(app.get(Reflector), {
         strategy: 'exposeAll',
         excludeExtraneousValues: true,
       }),
     )
-    .useGlobalPipes(new ValidationPipe());
-  await app.listen();
+    .useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+      }),
+    )
+    .listen();
 }
 
 bootstrap();

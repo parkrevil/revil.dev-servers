@@ -1,8 +1,8 @@
 import { Metadata } from '@grpc/grpc-js';
-import { Controller } from '@nestjs/common';
+import { Body, Controller, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserId, UserServiceController, UserServiceControllerMethods } from 'protobufs/user';
 
-import { CreateUserWithUsernameDto } from './dtos';
+import { CreateWithUsernameDto } from './dtos';
 import { UserService } from './user.service';
 
 @Controller()
@@ -10,13 +10,19 @@ import { UserService } from './user.service';
 export class UserController implements UserServiceController {
   constructor(private readonly userService: UserService) {}
 
-  async createUserWithUsername(req: CreateUserWithUsernameDto, metadata?: Metadata): Promise<UserId> {
-    const user = await this.userService.createWithUsername(req);
+  async createWithUsername(@Body() req: CreateWithUsernameDto, metadata?: Metadata): Promise<UserId> {
+    try {
+      console.log(req, metadata);
 
-    console.log(req, metadata, user);
+      const user = await this.userService.createWithUsername(req);
 
-    return {
-      id: 'test',
-    };
+      console.log(user);
+
+      return {
+        id: 'test',
+      };
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

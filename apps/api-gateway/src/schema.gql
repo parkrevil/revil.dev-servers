@@ -11,3 +11,13 @@ type Query {
   signInWithEmail(email: String!, password: String!): AuthTokens!
   signInWithGoogle(accessToken: String!): AuthTokens!
 }
+
+type Mutation {
+  createUserWithUsername(input: CreateUserWithUsernameInput!): Boolean!
+}
+
+input CreateUserWithUsernameInput {
+  username: String!
+  password: String!
+  nickname: String!
+}

@@ -9,7 +9,7 @@ export interface UserId {
   id: string;
 }
 
-export interface CreateUserWithUsernameParams {
+export interface CreateWithUsernameParams {
   username: string;
   password: string;
   nickname: string;
@@ -18,19 +18,19 @@ export interface CreateUserWithUsernameParams {
 export const USER_PACKAGE_NAME = 'user';
 
 export interface UserServiceClient {
-  createUserWithUsername(request: CreateUserWithUsernameParams, metadata?: Metadata): Observable<UserId>;
+  createWithUsername(request: CreateWithUsernameParams, metadata?: Metadata): Observable<UserId>;
 }
 
 export interface UserServiceController {
-  createUserWithUsername(
-    request: CreateUserWithUsernameParams,
+  createWithUsername(
+    request: CreateWithUsernameParams,
     metadata?: Metadata,
   ): Promise<UserId> | Observable<UserId> | UserId;
 }
 
 export function UserServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['createUserWithUsername'];
+    const grpcMethods: string[] = ['createWithUsername'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod('UserService', method)(constructor.prototype[method], method, descriptor);

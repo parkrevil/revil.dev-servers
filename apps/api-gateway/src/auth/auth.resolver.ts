@@ -1,3 +1,4 @@
+import { grpcClientInjectionTokens } from '@app/core';
 import { Inject, OnModuleInit } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { ClientGrpc } from '@nestjs/microservices';
@@ -11,7 +12,7 @@ import { AuthTokens } from './models';
 export class AuthResolver implements OnModuleInit {
   private authServiceClient: AuthServiceClient;
 
-  constructor(@Inject('AUTH_GRPC_PACKAGE') private authGrpcClient: ClientGrpc) {}
+  constructor(@Inject(grpcClientInjectionTokens.auth) private authGrpcClient: ClientGrpc) {}
 
   onModuleInit(): void {
     this.authServiceClient = this.authGrpcClient.getService<AuthServiceClient>('AuthService');

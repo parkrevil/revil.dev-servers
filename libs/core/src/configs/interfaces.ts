@@ -8,7 +8,7 @@ export interface GrpcServerConfig {
   url: string;
 }
 
-interface RedisConfig {
+export interface RedisConfig {
   host: string;
   port: number;
   password: string;

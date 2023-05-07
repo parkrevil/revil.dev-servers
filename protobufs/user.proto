@@ -3,14 +3,14 @@ syntax = "proto3";
 package user;
 
 service UserService {
-  rpc createUserWithUsername (CreateUserWithUsernameParams) returns (UserId) {}
+  rpc createWithUsername (CreateWithUsernameParams) returns (UserId) {}
 }
 
 message UserId {
   string id = 1;
 }
 
-message CreateUserWithUsernameParams {
+message CreateWithUsernameParams {
   string username = 1;
   string password = 2;
   string nickname = 3;
