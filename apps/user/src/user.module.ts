@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { redisStore } from 'cache-manager-redis-yet';
 import type { RedisClientOptions } from 'redis';
 
+import { User, UserSchema } from './schemas';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
@@ -18,6 +19,12 @@ import { UserService } from './user.service';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forFeature([
+      {
+        name: User.name,
+        schema: UserSchema,
+      },
+    ]),
     CacheModule.registerAsync<RedisClientOptions>({
       useFactory: async (configService: ConfigService) => {
         const userConfig = configService.get<UserConfig>('user');
