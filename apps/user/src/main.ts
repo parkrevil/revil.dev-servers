@@ -1,6 +1,7 @@
 import { UserConfig } from '@app/core/configs';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 
@@ -21,6 +22,14 @@ async function bootstrap() {
     },
   });
 
+  app
+    .useGlobalInterceptors(
+      new ClassSerializerInterceptor(app.get(Reflector), {
+        strategy: 'exposeAll',
+        excludeExtraneousValues: true,
+      }),
+    )
+    .useGlobalPipes(new ValidationPipe());
   await app.listen();
 }
 

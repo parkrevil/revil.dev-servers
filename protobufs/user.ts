@@ -9,20 +9,21 @@ export interface UserId {
   id: string;
 }
 
-export interface createUserWithUsernameParams {
+export interface CreateUserWithUsernameParams {
   username: string;
   password: string;
+  nickname: string;
 }
 
 export const USER_PACKAGE_NAME = 'user';
 
 export interface UserServiceClient {
-  createUserWithUsername(request: createUserWithUsernameParams, metadata?: Metadata): Observable<UserId>;
+  createUserWithUsername(request: CreateUserWithUsernameParams, metadata?: Metadata): Observable<UserId>;
 }
 
 export interface UserServiceController {
   createUserWithUsername(
-    request: createUserWithUsernameParams,
+    request: CreateUserWithUsernameParams,
     metadata?: Metadata,
   ): Promise<UserId> | Observable<UserId> | UserId;
 }
