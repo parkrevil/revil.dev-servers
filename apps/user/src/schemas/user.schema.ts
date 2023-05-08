@@ -1,7 +1,6 @@
 import { File } from '@app/core/mongoose/schemas';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { DateTime } from 'luxon';
-import moment, { Moment } from 'moment';
 import { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
@@ -9,6 +8,7 @@ export type UserDocument = HydratedDocument<User>;
 @Schema()
 export class User {
   @Prop({
+    unique: true,
     required: true,
   })
   username: string;

@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
-    "start": "concurrently \"npm run start:api-gateway\" \"npm run start:auth\" \"npm run start:user\"",
+    "start": "NODE_ENV=local concurrently \"npm run start:api-gateway\" \"npm run start:auth\" \"npm run start:user\"",
     "start:api-gateway": "nest start api-gateway --watch",
     "start:auth": "nest start auth --watch",
     "start:user": "nest start user --watch",
@@ -45,7 +45,6 @@
     "cookie-parser": "^1.4.6",
     "graphql": "^16.6.0",
     "helmet": "^6.1.5",
-    "moment": "^2.29.4",
     "mongoose": "^7.1.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0"

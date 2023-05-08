@@ -1,3 +1,5 @@
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+
 import { Env } from '../enums';
 
 export interface AppConfig {
@@ -21,6 +23,7 @@ export interface RedisDatabaseConfig {
 export interface ApiGatewayConfig extends RedisDatabaseConfig {
   host: string;
   port: number;
+  cors: CorsOptions;
 }
 
 export interface DatabasesConfig {

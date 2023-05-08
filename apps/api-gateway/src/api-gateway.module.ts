@@ -1,4 +1,4 @@
-import { CoreModule } from '@app/core';
+import { CoreModule, isLocal } from '@app/core';
 import { ApiGatewayConfig, DatabasesConfig } from '@app/core/configs';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -17,7 +17,7 @@ import { UserModule } from './user';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'apps/api-gateway/src/schema.gql'),
-      playground: true,
+      playground: isLocal,
     }),
     CacheModule.registerAsync<RedisClientOptions>({
       useFactory: async (configService: ConfigService) => {
