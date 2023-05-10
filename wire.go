@@ -5,12 +5,10 @@ package main
 
 import (
 	"github.com/google/wire"
-
-	"revil.dev-servers/ggabong"
 )
 
-func InitializeGgabong() ggabong.Ggabong {
-	wire.Build(ggabong.NewGgabong)
+func InitializeApp() (App, error) {
+	wire.Build(NewApp, NewConfig, NewServer)
 
-	return ggabong.Ggabong{}
+	return App{}, nil
 }

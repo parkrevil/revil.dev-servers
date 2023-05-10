@@ -6,13 +6,14 @@
 
 package main
 
-import (
-	"revil.dev-servers/ggabong"
-)
-
 // Injectors from wire.go:
 
-func InitializeGgabong() ggabong.Ggabong {
-	ggabongGgabong := ggabong.NewGgabong()
-	return ggabongGgabong
+func InitializeApp() (App, error) {
+	config, err := NewConfig()
+	if err != nil {
+		return App{}, err
+	}
+	server := NewServer(config)
+	app := NewApp(config, server)
+	return app, nil
 }

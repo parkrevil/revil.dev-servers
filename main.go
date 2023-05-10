@@ -1,27 +1,13 @@
 package main
 
 import (
-	"context"
-	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
-	"runtime"
-	"strconv"
 	"syscall"
-	"time"
 
-	"github.com/goccy/go-json"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/compress"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
-	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/gofiber/storage/redis/v2"
 	gql "github.com/graphql-go/graphql"
-	"github.com/joho/godotenv"
-	constant "revil.dev-servers/constant"
 )
 
 var TodoList []Todo
@@ -108,108 +94,32 @@ func main() {
 	   	)
 	   	sugar.Infof("Failed to fetch URL: %s", url)
 	*/
-	env := *flag.String("env", "", "local, production")
-	log.Print(env)
-	if env != "local" && env != "production" {
-		log.Fatal("Invalid argument env")
-	}
 
-	if err := godotenv.Load(".env." + env); err != nil {
-		log.Fatalf("Failed to load env file")
-	}
-
-	server := fiber.New(fiber.Config{
-		AppName:       "revil.dev",
-		Immutable:     true,
-		CaseSensitive: true,
-		StrictRouting: true,
-		JSONEncoder:   json.Marshal,
-		JSONDecoder:   json.Unmarshal,
-	})
-
-	/*
-		TODO: Add custom logging middleware with Zap
-	*/
-	server.Use(recover.New())
-
-	server.Use(cors.New(cors.Config{
-		AllowOrigins:     os.Getenv("SERVER_CORS_ORIGINS"),
-		AllowHeaders:     "Referer, Origin, Content-Type, Accept, Authorization",
-		AllowMethods:     "POST,GET",
-		AllowCredentials: false,
-	}))
-	server.Use(compress.New(compress.Config{
-		Level: compress.LevelBestCompression,
-	}))
-	server.Use(recover.New(recover.Config{
-		EnableStackTrace: true,
-	}))
-
-	if env == constant.EnvProduction {
-		redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
-		if err != nil {
-			log.Fatalf("Invalid redis port: %v", err)
-		}
-
-		server.Use(limiter.New(limiter.Config{
-			Max:               10,
-			Expiration:        10 * time.Second,
-			LimiterMiddleware: limiter.SlidingWindow{},
-			Storage: redis.New(redis.Config{
-				Host:      os.Getenv("REDIS_HOST"),
-				Port:      redisPort,
-				Password:  os.Getenv("REDIS_PASSWORD"),
-				Database:  0,
-				Reset:     false,
-				TLSConfig: nil,
-				PoolSize:  10 * runtime.GOMAXPROCS(0),
-			}),
-		}))
-		server.Use(requestid.New())
-	}
-
-	server.Post("/graphql", func(ctx *fiber.Ctx) error {
-		body := new(GqlBody)
-
-		if err := ctx.BodyParser(body); err != nil {
-			return err
-		}
-
-		result := gql.Do(gql.Params{
-			Context:        ctx.Context(),
-			Schema:         TodoSchema,
-			RequestString:  body.Query,
-			VariableValues: body.Variables,
-			OperationName:  body.Operation,
-		})
-
-		return ctx.JSON(result)
-	})
-
-	if err := server.Listen(os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT")); err != nil {
+	app, err := InitializeApp()
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	server.Static("/sandbox", "./public/sandbox.html")
-
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
+	serverShutdown := make(chan struct{})
 
-	log.Print("Shutting down...")
-	log.Print("- fiber")
+	go func() {
+		<-quit
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
+		log.Print("Shutting down...")
+		log.Print("- fiber")
 
-	if err := server.ShutdownWithContext(ctx); err != nil {
-		log.Fatal(err)
-	}
+		if err := app.shutdown(); err != nil {
+			log.Fatal(err)
+		}
 
-	select {
-	case <-ctx.Done():
-		log.Print("Timeout shutting down fiber")
-	}
+		serverShutdown <- struct{}{}
+	}()
 
-	log.Print("done")
+	app.start()
+
+	<-serverShutdown
+
+	fmt.Println("Shutted down")
 }
