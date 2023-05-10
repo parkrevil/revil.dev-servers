@@ -9,9 +9,23 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	env := os.Getenv("REVILDEV_ENV")
+	if env == "" {
+		log.Fatal("REVILDEV_ENV must be set")
+	}
+
+	envFilePath := ".env." + env
+	if err := godotenv.Load(envFilePath); err != nil {
+		log.Fatalf("Error loading %s file", envFilePath)
+	}
+
+	serverHost := os.Getenv("SERVER_HOST")
+	serverPort := os.Getenv("SERVER_PORT")
+
 	server := fiber.New(fiber.Config{
 		AppName:       "revil.dev",
 		Immutable:     true,
@@ -20,7 +34,7 @@ func main() {
 	})
 
 	go func() {
-		if err := server.Listen(":3000"); err != nil {
+		if err := server.Listen(serverHost + ":" + serverPort); err != nil {
 			log.Fatal(err)
 		}
 	}()
@@ -32,7 +46,7 @@ func main() {
 	log.Print("Shutting down...")
 	log.Print("- fiber")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
 	if err := server.ShutdownWithContext(ctx); err != nil {
