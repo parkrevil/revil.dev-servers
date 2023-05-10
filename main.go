@@ -20,6 +20,7 @@ import (
 	"github.com/gofiber/storage/redis/v2"
 	gql "github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
 var TodoList []Todo
@@ -92,6 +93,18 @@ type GqlBody struct {
 }
 
 func main() {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync() // flushes buffer, if any
+
+	url := "test"
+	sugar := logger.Sugar()
+	sugar.Infow("failed to fetch URL",
+		"url", url,
+		"attempt", 3,
+		"backoff", time.Second,
+	)
+	sugar.Infof("Failed to fetch URL: %s", url)
+
 	env := os.Getenv("REVILDEV_ENV")
 	if env == "" {
 		log.Fatal("REVILDEV_ENV must be set")
@@ -110,6 +123,12 @@ func main() {
 		JSONEncoder:   json.Marshal,
 		JSONDecoder:   json.Unmarshal,
 	})
+
+	/*
+		TODO: Add custom logging middleware with Zap
+	*/
+	server.Use(recover.New())
+
 	server.Use(cors.New(cors.Config{
 		AllowOrigins:     os.Getenv("SERVER_CORS_ORIGINS"),
 		AllowHeaders:     "Referer, Origin, Content-Type, Accept, Authorization",
