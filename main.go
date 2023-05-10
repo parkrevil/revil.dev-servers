@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -9,7 +10,6 @@ import (
 	"strconv"
 	"syscall"
 	"time"
-	"fmt"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -21,7 +21,6 @@ import (
 	"github.com/gofiber/storage/redis/v2"
 	gql "github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
-	"go.uber.org/zap"
 	constant "revil.dev-servers/constant"
 )
 
@@ -94,34 +93,29 @@ type GqlBody struct {
 }
 
 func main() {
-	e, err := InitializeEvent("test")
-	if err != nil {
-			fmt.Printf("failed to create event: %s\n", err)
-			os.Exit(2)
-	}
-	e.Start()
-	e.Start()
+	/* 	ggabong := InitializeGgabong()
+	   	ggabong.Start()
 
-	logger, _ := zap.NewProduction()
-	defer logger.Sync() // flushes buffer, if any
+	   	logger, _ := zap.NewProduction()
+	   	defer logger.Sync() // flushes buffer, if any
 
-	url := "test"
-	sugar := logger.Sugar()
-	sugar.Infow("failed to fetch URL",
-		"url", url,
-		"attempt", 3,
-		"backoff", time.Second,
-	)
-	sugar.Infof("Failed to fetch URL: %s", url)
-
-	env := os.Getenv("REVILDEV_ENV")
-	if env == "" {
-		log.Fatal("REVILDEV_ENV must be set")
+	   	url := "test"
+	   	sugar := logger.Sugar()
+	   	sugar.Infow("failed to fetch URL",
+	   		"url", url,
+	   		"attempt", 3,
+	   		"backoff", time.Second,
+	   	)
+	   	sugar.Infof("Failed to fetch URL: %s", url)
+	*/
+	env := *flag.String("env", "", "local, production")
+	log.Print(env)
+	if env != "local" && env != "production" {
+		log.Fatal("Invalid argument env")
 	}
 
-	envFilePath := ".env." + env
-	if err := godotenv.Load(envFilePath); err != nil {
-		log.Fatalf("Error loading %v file", envFilePath)
+	if err := godotenv.Load(".env." + env); err != nil {
+		log.Fatalf("Failed to load env file")
 	}
 
 	server := fiber.New(fiber.Config{

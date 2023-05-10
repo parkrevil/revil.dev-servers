@@ -5,13 +5,12 @@ package main
 
 import (
 	"github.com/google/wire"
-	"revil.dev-servers/event"
-	"revil.dev-servers/greeter"
-	"revil.dev-servers/message"
+
+	"revil.dev-servers/ggabong"
 )
 
-func InitializeEvent(phrase string) (event.Event, error) {
-	wire.Build(event.NewEvent, greeter.NewGreeter, message.NewMessage)
+func InitializeGgabong() ggabong.Ggabong {
+	wire.Build(ggabong.NewGgabong)
 
-	return event.Event{}, nil
+	return ggabong.Ggabong{}
 }
