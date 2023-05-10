@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gofiber/fiber/v2 v2.45.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/graphql-go/graphql v0.8.1 // indirect

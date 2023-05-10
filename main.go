@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	gql "github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
@@ -101,6 +102,8 @@ func main() {
 		Immutable:     true,
 		CaseSensitive: true,
 		StrictRouting: true,
+		JSONEncoder:   json.Marshal,
+		JSONDecoder:   json.Unmarshal,
 	})
 
 	server.Post("/graphql", func(ctx *fiber.Ctx) error {
