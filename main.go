@@ -5,14 +5,19 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
+	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/gofiber/storage/redis/v2"
 	gql "github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
 )
@@ -94,7 +99,12 @@ func main() {
 
 	envFilePath := ".env." + env
 	if err := godotenv.Load(envFilePath); err != nil {
-		log.Fatalf("Error loading %s file", envFilePath)
+		log.Fatalf("Error loading %v file", envFilePath)
+	}
+
+	redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
+	if err != nil {
+		log.Fatalf("Invalid redis port: %v", err)
 	}
 
 	server := fiber.New(fiber.Config{
@@ -111,10 +121,28 @@ func main() {
 		AllowMethods:     "POST,GET",
 		AllowCredentials: false,
 	}))
+	server.Use(compress.New(compress.Config{
+		Level: compress.LevelBestCompression,
+	}))
+	server.Use(requestid.New())
+	server.Use(limiter.New(limiter.Config{
+		Max:               10,
+		Expiration:        10 * time.Second,
+		LimiterMiddleware: limiter.SlidingWindow{},
+		Storage: redis.New(redis.Config{
+			Host:      os.Getenv("REDIS_HOST"),
+			Port:      redisPort,
+			Password:  os.Getenv("REDIS_PASSWORD"),
+			Database:  0,
+			Reset:     false,
+			TLSConfig: nil,
+			PoolSize:  10 * runtime.GOMAXPROCS(0),
+		}),
+	}))
 	server.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
 	}))
-	server.Use(requestid.New())
+
 	server.Post("/graphql", func(ctx *fiber.Ctx) error {
 		body := new(GqlBody)
 
@@ -133,11 +161,9 @@ func main() {
 		return ctx.JSON(result)
 	})
 
-	go func() {
-		if err := server.Listen(os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT")); err != nil {
-			log.Fatal(err)
-		}
-	}()
+	if err := server.Listen(os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT")); err != nil {
+		log.Fatal(err)
+	}
 
 	server.Static("/sandbox", "./public/sandbox.html")
 
