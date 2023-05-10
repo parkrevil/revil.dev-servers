@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	gql "github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
 )
@@ -113,6 +114,7 @@ func main() {
 	server.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
 	}))
+	server.Use(requestid.New())
 	server.Post("/graphql", func(ctx *fiber.Ctx) error {
 		body := new(GqlBody)
 
