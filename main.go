@@ -10,6 +10,7 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	gql "github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
 )
@@ -94,9 +95,6 @@ func main() {
 		log.Fatalf("Error loading %s file", envFilePath)
 	}
 
-	serverHost := os.Getenv("SERVER_HOST")
-	serverPort := os.Getenv("SERVER_PORT")
-
 	server := fiber.New(fiber.Config{
 		AppName:       "revil.dev",
 		Immutable:     true,
@@ -105,6 +103,13 @@ func main() {
 		JSONEncoder:   json.Marshal,
 		JSONDecoder:   json.Unmarshal,
 	})
+
+	server.Use(cors.New(cors.Config{
+		AllowOrigins:     os.Getenv("SERVER_CORS_ORIGINS"),
+		AllowHeaders:     "Referer, Origin, Content-Type, Accept, Authorization",
+		AllowMethods:     "POST,GET",
+		AllowCredentials: false,
+	}))
 
 	server.Post("/graphql", func(ctx *fiber.Ctx) error {
 		body := new(GqlBody)
@@ -125,7 +130,7 @@ func main() {
 	})
 
 	go func() {
-		if err := server.Listen(serverHost + ":" + serverPort); err != nil {
+		if err := server.Listen(os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT")); err != nil {
 			log.Fatal(err)
 		}
 	}()
