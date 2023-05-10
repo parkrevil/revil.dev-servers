@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+	"fmt"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -21,6 +22,7 @@ import (
 	gql "github.com/graphql-go/graphql"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
+	constant "revil.dev-servers/constant"
 )
 
 var TodoList []Todo
@@ -58,7 +60,6 @@ var rootQuery = gql.NewObject(gql.ObjectConfig{
 				},
 			},
 			Resolve: func(params gql.ResolveParams) (interface{}, error) {
-
 				idQuery, isOK := params.Args["id"].(string)
 				if isOK {
 					// Search for el with id
@@ -93,6 +94,14 @@ type GqlBody struct {
 }
 
 func main() {
+	e, err := InitializeEvent("test")
+	if err != nil {
+			fmt.Printf("failed to create event: %s\n", err)
+			os.Exit(2)
+	}
+	e.Start()
+	e.Start()
+
 	logger, _ := zap.NewProduction()
 	defer logger.Sync() // flushes buffer, if any
 
@@ -142,7 +151,7 @@ func main() {
 		EnableStackTrace: true,
 	}))
 
-	if env == "production" {
+	if env == constant.EnvProduction {
 		redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
 		if err != nil {
 			log.Fatalf("Invalid redis port: %v", err)
