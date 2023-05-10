@@ -102,11 +102,6 @@ func main() {
 		log.Fatalf("Error loading %v file", envFilePath)
 	}
 
-	redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
-	if err != nil {
-		log.Fatalf("Invalid redis port: %v", err)
-	}
-
 	server := fiber.New(fiber.Config{
 		AppName:       "revil.dev",
 		Immutable:     true,
@@ -124,24 +119,32 @@ func main() {
 	server.Use(compress.New(compress.Config{
 		Level: compress.LevelBestCompression,
 	}))
-	server.Use(requestid.New())
-	server.Use(limiter.New(limiter.Config{
-		Max:               10,
-		Expiration:        10 * time.Second,
-		LimiterMiddleware: limiter.SlidingWindow{},
-		Storage: redis.New(redis.Config{
-			Host:      os.Getenv("REDIS_HOST"),
-			Port:      redisPort,
-			Password:  os.Getenv("REDIS_PASSWORD"),
-			Database:  0,
-			Reset:     false,
-			TLSConfig: nil,
-			PoolSize:  10 * runtime.GOMAXPROCS(0),
-		}),
-	}))
 	server.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
 	}))
+
+	if env == "production" {
+		redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
+		if err != nil {
+			log.Fatalf("Invalid redis port: %v", err)
+		}
+
+		server.Use(limiter.New(limiter.Config{
+			Max:               10,
+			Expiration:        10 * time.Second,
+			LimiterMiddleware: limiter.SlidingWindow{},
+			Storage: redis.New(redis.Config{
+				Host:      os.Getenv("REDIS_HOST"),
+				Port:      redisPort,
+				Password:  os.Getenv("REDIS_PASSWORD"),
+				Database:  0,
+				Reset:     false,
+				TLSConfig: nil,
+				PoolSize:  10 * runtime.GOMAXPROCS(0),
+			}),
+		}))
+		server.Use(requestid.New())
+	}
 
 	server.Post("/graphql", func(ctx *fiber.Ctx) error {
 		body := new(GqlBody)
