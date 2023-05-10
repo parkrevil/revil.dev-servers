@@ -1,29 +1,14 @@
 package main
 
 import (
-	"log"
-	"os"
-	"runtime"
-	"strconv"
-	"time"
+	"context"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/compress"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
-	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/gofiber/storage/redis/v2"
+	"go.uber.org/fx"
 )
 
-type Server struct {
-	config Config
-	server *fiber.App
-}
-
-func NewServer(config Config) Server {
-	config.print()
+func NewHTTPServer(lc fx.Lifecycle) *fiber.App {
 	server := fiber.New(fiber.Config{
 		AppName:       "revil.dev",
 		Immutable:     true,
@@ -32,23 +17,44 @@ func NewServer(config Config) Server {
 		JSONEncoder:   json.Marshal,
 		JSONDecoder:   json.Unmarshal,
 	})
-	server.Use(recover.New())
-	server.Use(cors.New(cors.Config{
+
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			go server.Listen(":20000")
+
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			return server.ShutdownWithContext(ctx)
+		},
+	})
+
+	return server
+}
+
+/*
+func NewHTTPServer(lc fx.Lifecycle) *Server {
+	app := fiber.New(fiber.Config{
+		AppName:       "revil.dev",
+		Immutable:     true,
+		CaseSensitive: true,
+		StrictRouting: true,
+		JSONEncoder:   json.Marshal,
+		JSONDecoder:   json.Unmarshal,
+	})
+	app.Use(recover.New())
+	app.Use(cors.New(cors.Config{
 		AllowOrigins:     os.Getenv("SERVER_CORS_ORIGINS"),
 		AllowHeaders:     "Referer, Origin, Content-Type, Accept, Authorization",
 		AllowMethods:     "POST,GET",
 		AllowCredentials: false,
 	}))
-	server.Use(compress.New(compress.Config{
+	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestCompression,
 	}))
-	server.Use(recover.New(recover.Config{
+	app.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
 	}))
-
-	/*
-		TODO: Add custom logging middleware with Zap
-	*/
 
 	if config.env == Production {
 		redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
@@ -56,7 +62,7 @@ func NewServer(config Config) Server {
 			log.Fatalf("Invalid redis port: %v", err)
 		}
 
-		server.Use(limiter.New(limiter.Config{
+		app.Use(limiter.New(limiter.Config{
 			Max:               10,
 			Expiration:        10 * time.Second,
 			LimiterMiddleware: limiter.SlidingWindow{},
@@ -70,7 +76,7 @@ func NewServer(config Config) Server {
 				PoolSize:  10 * runtime.GOMAXPROCS(0),
 			}),
 		}))
-		server.Use(requestid.New())
+		app.Use(requestid.New())
 	}
 	/*
 		server.Post("/graphql", func(ctx *fiber.Ctx) error {
@@ -90,21 +96,36 @@ func NewServer(config Config) Server {
 
 			return ctx.JSON(result)
 		})
-	*/
-	server.Static("/sandbox", "./public/sandbox.html")
+*/
+/* 	app.Static("/sandbox", "./public/sandbox.html")
 
-	return Server{
+	server := Server{
 		config: config,
-		server: server,
-	}
-}
-
-func (a *Server) start() error {
-	if err := a.server.Listen(os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT")); err != nil {
-		log.Fatal(err)
+		server: app,
 	}
 
-	return nil
+	lc.Append(fx.Hook{
+    OnStart: func(ctx context.Context) error {
+			if err := server.server.Listen(os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT")); err != nil {
+				log.Fatal(err)
+			}
+
+			return nil
+
+      ln, err := net.Listen("tcp", srv.Addr)
+      if err != nil {
+        return err
+      }
+      fmt.Println("Starting HTTP server at", srv.Addr)
+      go srv.Serve(ln)
+      return nil
+    },
+    OnStop: func(ctx context.Context) error {
+      return srv.Shutdown(ctx)
+    },
+  })
+
+	return &
 }
 
 func (s *Server) shutdown() error {
@@ -114,3 +135,4 @@ func (s *Server) shutdown() error {
 
 	return nil
 }
+*/

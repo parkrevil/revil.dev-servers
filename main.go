@@ -1,13 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"os/signal"
-	"syscall"
-
+	"github.com/gofiber/fiber/v2"
 	gql "github.com/graphql-go/graphql"
+	"go.uber.org/fx"
 )
 
 var TodoList []Todo
@@ -94,32 +90,8 @@ func main() {
 	   	)
 	   	sugar.Infof("Failed to fetch URL: %s", url)
 	*/
-
-	app, err := InitializeApp()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	serverShutdown := make(chan struct{})
-
-	go func() {
-		<-quit
-
-		log.Print("Shutting down...")
-		log.Print("- fiber")
-
-		if err := app.shutdown(); err != nil {
-			log.Fatal(err)
-		}
-
-		serverShutdown <- struct{}{}
-	}()
-
-	app.start()
-
-	<-serverShutdown
-
-	fmt.Println("Shutted down")
+	fx.New(
+		fx.Provide(NewHTTPServer),
+		fx.Invoke(func(*fiber.App) {}),
+	).Run()
 }
