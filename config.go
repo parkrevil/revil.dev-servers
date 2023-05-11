@@ -18,14 +18,20 @@ const (
 )
 
 type Config struct {
-	env    string
-	server ServerConfig
-	redis  RedisConfig
+	env     string
+	server  ServerConfig
+	mongodb MongoDBConfig
+	redis   RedisConfig
 }
 
 type ServerConfig struct {
 	host string
 	port int
+}
+
+type MongoDBConfig struct {
+	uri      string
+	database string
 }
 
 type RedisConfig struct {
@@ -62,6 +68,10 @@ func NewConfig() (*Config, error) {
 		server: ServerConfig{
 			host: os.Getenv("SERVER_HOST"),
 			port: serverPort,
+		},
+		mongodb: MongoDBConfig{
+			uri:      os.Getenv("MONGODB_URI"),
+			database: os.Getenv("MONGODB_DATABASE"),
 		},
 		redis: RedisConfig{
 			host:      os.Getenv("REDIS_HOST"),

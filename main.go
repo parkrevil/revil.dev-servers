@@ -46,6 +46,7 @@ func main() {
 	fx.New(
 		fx.Provide(
 			NewConfig,
+			NewMongoDB,
 			NewGraphQL,
 			NewGgabongResolver,
 			zap.NewProduction,
