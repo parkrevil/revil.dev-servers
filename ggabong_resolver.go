@@ -30,9 +30,6 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 type GgabongResolver struct{}
 
 func NewGgabongResolver() *GgabongResolver {
-	/*
-
-	 */
 	return &GgabongResolver{}
 }
 

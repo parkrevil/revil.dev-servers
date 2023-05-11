@@ -18,7 +18,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func NewHTTPServer(lc fx.Lifecycle, config *Config, gql *GraphQL) (*fiber.App, error) {
+func NewHttpServer(lc fx.Lifecycle, config *Config, gql *GraphQL) (*fiber.App, error) {
 	server := fiber.New(fiber.Config{
 		AppName:       "revil.dev",
 		Immutable:     true,
@@ -56,7 +56,7 @@ func NewHTTPServer(lc fx.Lifecycle, config *Config, gql *GraphQL) (*fiber.App, e
 	}))
 	server.Use(requestid.New())
 
-	err := gql.addHTTPHandlers(server)
+	err := gql.addHttpHandlers(server)
 	if err != nil {
 		return nil, err
 	}

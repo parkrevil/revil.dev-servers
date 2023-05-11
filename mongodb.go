@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,6 +11,7 @@ import (
 )
 
 func NewMongoDB(lc fx.Lifecycle, config *Config) (*mongo.Database, error) {
+	log.Print((config.mongodb.uri))
 	options := options.Client().ApplyURI(config.mongodb.uri)
 	options.SetMaxPoolSize(100)
 	options.SetMinPoolSize(10)
@@ -22,6 +24,7 @@ func NewMongoDB(lc fx.Lifecycle, config *Config) (*mongo.Database, error) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
+			log.Print("Connect to MongoDB")
 			return client.Connect(ctx)
 		},
 		OnStop: func(ctx context.Context) error {

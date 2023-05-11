@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/graphql-go/graphql"
 )
@@ -24,15 +26,16 @@ type GraphQLResolver interface {
 	GetSchemas() GraphQLResolverSchema
 }
 
-func NewGraphQL(ggabongResolver *GgabongResolver) *GraphQL {
+func NewGraphQL(ggabongResolver *GgabongResolver, userResolver *UserResolver) *GraphQL {
 	return &GraphQL{
 		resolvers: []GraphQLResolver{
 			ggabongResolver,
+			userResolver,
 		},
 	}
 }
 
-func (g *GraphQL) addHTTPHandlers(server *fiber.App) error {
+func (g *GraphQL) addHttpHandlers(server *fiber.App) error {
 	queryFields := graphql.Fields{}
 	mutationFields := graphql.Fields{}
 
@@ -58,6 +61,8 @@ func (g *GraphQL) addHTTPHandlers(server *fiber.App) error {
 		})
 	}
 
+	log.Print(mutationFields)
+
 	if len(mutationFields) > 0 {
 		mutation = graphql.NewObject(graphql.ObjectConfig{
 			Name:   "Mutation",
@@ -72,6 +77,7 @@ func (g *GraphQL) addHTTPHandlers(server *fiber.App) error {
 	if err != nil {
 		return err
 	}
+
 	server.Post("/graphql", func(ctx *fiber.Ctx) error {
 		body := new(GqlBody)
 
