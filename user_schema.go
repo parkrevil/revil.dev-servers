@@ -13,8 +13,3 @@ var createUserInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 		},
 	},
 })
-
-type createUserInput struct {
-	username string
-	password string
-}
