@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	gql "github.com/graphql-go/graphql"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 )
 
 var TodoList []Todo
@@ -91,7 +92,10 @@ func main() {
 	   	sugar.Infof("Failed to fetch URL: %s", url)
 	*/
 	fx.New(
-		fx.Provide(NewHTTPServer),
+		fx.Provide(
+			NewHTTPServer,
+			zap.NewProduction,
+		),
 		fx.Invoke(func(*fiber.App) {}),
 	).Run()
 }
