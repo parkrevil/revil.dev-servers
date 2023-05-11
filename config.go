@@ -29,9 +29,12 @@ type ServerConfig struct {
 }
 
 type RedisConfig struct {
-	host     string
-	port     int
-	password string
+	host      string
+	port      int
+	password  string
+	limiterDb int
+	authDb    int
+	cacheDb   int
 }
 
 func NewConfig() (*Config, error) {
@@ -48,15 +51,11 @@ func NewConfig() (*Config, error) {
 		return nil, errors.New("Failed to load env file")
 	}
 
-	serverPort, err := strconv.Atoi(os.Getenv("SERVER_PORT"))
-	if err != nil {
-		return nil, err
-	}
-
-	redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
-	if err != nil {
-		return nil, err
-	}
+	serverPort, _ := strconv.Atoi(os.Getenv("SERVER_PORT"))
+	redisPort, _ := strconv.Atoi(os.Getenv("REDIS_PORT"))
+	limiterDb, _ := strconv.Atoi(os.Getenv("REDIS_DB_LIMITER"))
+	cacheDb, _ := strconv.Atoi(os.Getenv("REDIS_DB_CACHE"))
+	authDb, _ := strconv.Atoi(os.Getenv("REDIS_DB_AUTH"))
 
 	return &Config{
 		env: env,
@@ -65,9 +64,12 @@ func NewConfig() (*Config, error) {
 			port: serverPort,
 		},
 		redis: RedisConfig{
-			host:     os.Getenv("REDIS_HOST"),
-			port:     redisPort,
-			password: os.Getenv("REDIS_PASSWORD"),
+			host:      os.Getenv("REDIS_HOST"),
+			port:      redisPort,
+			password:  os.Getenv("REDIS_PASSWORD"),
+			limiterDb: limiterDb,
+			authDb:    authDb,
+			cacheDb:   cacheDb,
 		},
 	}, nil
 }
