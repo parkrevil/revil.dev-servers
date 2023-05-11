@@ -34,33 +34,31 @@ type RedisConfig struct {
 	password string
 }
 
-func NewConfig() (Config, error) {
+func NewConfig() (*Config, error) {
 	var env string
 
 	flag.StringVar(&env, "env", "", "local, production")
 	flag.Parse()
 
-	empty := Config{}
-
 	if env != Local && env != Production {
-		return empty, errors.New("Invalid argument env")
+		return nil, errors.New("Invalid argument env")
 	}
 
 	if err := godotenv.Load(".env." + env); err != nil {
-		return empty, errors.New("Failed to load env file")
+		return nil, errors.New("Failed to load env file")
 	}
 
 	serverPort, err := strconv.Atoi(os.Getenv("SERVER_PORT"))
 	if err != nil {
-		return empty, err
+		return nil, err
 	}
 
 	redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
 	if err != nil {
-		return empty, err
+		return nil, err
 	}
 
-	return Config{
+	return &Config{
 		env: env,
 		server: ServerConfig{
 			host: os.Getenv("SERVER_HOST"),

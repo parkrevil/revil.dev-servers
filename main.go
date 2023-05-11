@@ -93,6 +93,7 @@ func main() {
 	*/
 	fx.New(
 		fx.Provide(
+			NewConfig,
 			NewHTTPServer,
 			zap.NewProduction,
 		),

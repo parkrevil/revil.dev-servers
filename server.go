@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
 )
 
-func NewHTTPServer(lc fx.Lifecycle) *fiber.App {
+func NewHTTPServer(lc fx.Lifecycle, config *Config) *fiber.App {
 	server := fiber.New(fiber.Config{
 		AppName:       "revil.dev",
 		Immutable:     true,
@@ -20,7 +21,7 @@ func NewHTTPServer(lc fx.Lifecycle) *fiber.App {
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			go server.Listen(":20000")
+			go server.Listen(config.server.host + ":" + strconv.Itoa(config.server.port))
 
 			return nil
 		},
