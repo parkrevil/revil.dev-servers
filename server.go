@@ -18,7 +18,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func NewHTTPServer(lc fx.Lifecycle, config *Config, gql *GraphQL) *fiber.App {
+func NewHTTPServer(lc fx.Lifecycle, config *Config, gql *GraphQL) (*fiber.App, error) {
 	server := fiber.New(fiber.Config{
 		AppName:       "revil.dev",
 		Immutable:     true,
@@ -41,7 +41,7 @@ func NewHTTPServer(lc fx.Lifecycle, config *Config, gql *GraphQL) *fiber.App {
 		EnableStackTrace: true,
 	}))
 	server.Use(limiter.New(limiter.Config{
-		Max:               10,
+		Max:               100,
 		Expiration:        10 * time.Second,
 		LimiterMiddleware: limiter.SlidingWindow{},
 		Storage: redis.New(redis.Config{
@@ -56,7 +56,10 @@ func NewHTTPServer(lc fx.Lifecycle, config *Config, gql *GraphQL) *fiber.App {
 	}))
 	server.Use(requestid.New())
 
-	gql.addHTTPHandler(server)
+	err := gql.addHTTPHandlers(server)
+	if err != nil {
+		return nil, err
+	}
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -69,5 +72,5 @@ func NewHTTPServer(lc fx.Lifecycle, config *Config, gql *GraphQL) *fiber.App {
 		},
 	})
 
-	return server
+	return server, nil
 }
