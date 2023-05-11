@@ -2,10 +2,20 @@ package main
 
 import (
 	"context"
+	"log"
+	"os"
+	"runtime"
 	"strconv"
+	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/gofiber/storage/redis/v2"
 	"go.uber.org/fx"
 )
 
@@ -18,6 +28,42 @@ func NewHTTPServer(lc fx.Lifecycle, config *Config) *fiber.App {
 		JSONEncoder:   json.Marshal,
 		JSONDecoder:   json.Unmarshal,
 	})
+	server.Use(recover.New())
+	server.Use(cors.New(cors.Config{
+		AllowOrigins:     os.Getenv("SERVER_CORS_ORIGINS"),
+		AllowHeaders:     "Referer, Origin, Content-Type, Accept, Authorization",
+		AllowMethods:     "POST,GET",
+		AllowCredentials: false,
+	}))
+	server.Use(compress.New(compress.Config{
+		Level: compress.LevelBestCompression,
+	}))
+	server.Use(recover.New(recover.Config{
+		EnableStackTrace: true,
+	}))
+
+	if config.env == Production {
+		redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
+		if err != nil {
+			log.Fatalf("Invalid redis port: %v", err)
+		}
+
+		server.Use(limiter.New(limiter.Config{
+			Max:               10,
+			Expiration:        10 * time.Second,
+			LimiterMiddleware: limiter.SlidingWindow{},
+			Storage: redis.New(redis.Config{
+				Host:      os.Getenv("REDIS_HOST"),
+				Port:      redisPort,
+				Password:  os.Getenv("REDIS_PASSWORD"),
+				Database:  0,
+				Reset:     false,
+				TLSConfig: nil,
+				PoolSize:  10 * runtime.GOMAXPROCS(0),
+			}),
+		}))
+		server.Use(requestid.New())
+	}
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -35,50 +81,6 @@ func NewHTTPServer(lc fx.Lifecycle, config *Config) *fiber.App {
 
 /*
 func NewHTTPServer(lc fx.Lifecycle) *Server {
-	app := fiber.New(fiber.Config{
-		AppName:       "revil.dev",
-		Immutable:     true,
-		CaseSensitive: true,
-		StrictRouting: true,
-		JSONEncoder:   json.Marshal,
-		JSONDecoder:   json.Unmarshal,
-	})
-	app.Use(recover.New())
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     os.Getenv("SERVER_CORS_ORIGINS"),
-		AllowHeaders:     "Referer, Origin, Content-Type, Accept, Authorization",
-		AllowMethods:     "POST,GET",
-		AllowCredentials: false,
-	}))
-	app.Use(compress.New(compress.Config{
-		Level: compress.LevelBestCompression,
-	}))
-	app.Use(recover.New(recover.Config{
-		EnableStackTrace: true,
-	}))
-
-	if config.env == Production {
-		redisPort, err := strconv.Atoi(os.Getenv("REDIS_PORT"))
-		if err != nil {
-			log.Fatalf("Invalid redis port: %v", err)
-		}
-
-		app.Use(limiter.New(limiter.Config{
-			Max:               10,
-			Expiration:        10 * time.Second,
-			LimiterMiddleware: limiter.SlidingWindow{},
-			Storage: redis.New(redis.Config{
-				Host:      os.Getenv("REDIS_HOST"),
-				Port:      redisPort,
-				Password:  os.Getenv("REDIS_PASSWORD"),
-				Database:  0,
-				Reset:     false,
-				TLSConfig: nil,
-				PoolSize:  10 * runtime.GOMAXPROCS(0),
-			}),
-		}))
-		app.Use(requestid.New())
-	}
 	/*
 		server.Post("/graphql", func(ctx *fiber.Ctx) error {
 			body := new(GqlBody)
