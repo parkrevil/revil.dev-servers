@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/graphql-go/graphql"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,11 +14,11 @@ import (
 )
 
 type User struct {
-	ID        primitive.ObjectID `bson:"_id"`
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
 	Username  string             `bson:"username"`
 	Password  string             `bson:"password"`
 	ImageUrl  string             `bson:"image_url"`
-	CreatedAt primitive.DateTime `bson:"created_at"`
+	CreatedAt primitive.DateTime `bson:"created_at,omitempty"`
 }
 
 var userType = graphql.NewObject(graphql.ObjectConfig{
@@ -80,17 +81,16 @@ func (g *UserResolver) GetSchemas() GraphQLResolverSchema {
 }
 
 func (g *UserResolver) create(p graphql.ResolveParams) (interface{}, error) {
-	args := p.Args["input"]
-	result, err := g.mongo.InsertOne(p.Context, User{
-		Username: args["username"].(string),
-		Password: args["password"].(string),
+	input := p.Args["input"].(map[string]interface{})
+
+	_, err := g.mongo.InsertOne(p.Context, User{
+		Username:  input["username"].(string),
+		Password:  input["password"].(string),
+		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
 	})
 	if err != nil {
-		log.Print(err)
 		return nil, err
 	}
-
-	log.Print(result)
 
 	return nil, nil
 }
