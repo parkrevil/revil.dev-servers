@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/graphql-go/graphql"
@@ -17,8 +16,10 @@ type User struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty"`
 	Username  string             `bson:"username"`
 	Password  string             `bson:"password"`
+	Email     string             `bson:"email"`
 	ImageUrl  string             `bson:"image_url"`
 	CreatedAt primitive.DateTime `bson:"created_at,omitempty"`
+	UpdatedAt primitive.DateTime `bson:"updated_at,omitempty"`
 }
 
 var userType = graphql.NewObject(graphql.ObjectConfig{
@@ -30,8 +31,14 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 		"username": &graphql.Field{
 			Type: graphql.String,
 		},
+		"email": &graphql.Field{
+			Type: graphql.String,
+		},
 		"imageUrl": &graphql.Field{
 			Type: graphql.String,
+		},
+		"createdAt": &graphql.Field{
+			Type: graphql.DateTime,
 		},
 	},
 })
@@ -45,14 +52,19 @@ func NewUserResolver(lc fx.Lifecycle, mongodb *mongo.Database) *UserResolver {
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			indexModel := mongo.IndexModel{
-				Keys:    bson.D{{Key: "username", Value: -1}},
-				Options: options.Index().SetUnique(true),
+			indexModels := []mongo.IndexModel{
+				{
+					Keys:    bson.D{{Key: "username", Value: -1}},
+					Options: options.Index().SetUnique(true),
+				},
+				{
+					Keys:    bson.D{{Key: "email", Value: -1}},
+					Options: options.Index().SetUnique(true),
+				},
 			}
-			if _, err := collection.Indexes().CreateOne(ctx, indexModel); err != nil {
+			if _, err := collection.Indexes().CreateMany(ctx, indexModels); err != nil {
 				return err
 			}
-			log.Print("Create MongoDB unique index: User.username")
 
 			return nil
 		},
