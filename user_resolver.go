@@ -16,6 +16,7 @@ type User struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty"`
 	Username  string             `bson:"username"`
 	Password  string             `bson:"password"`
+	Nickname  string             `bson:"nickname"`
 	Email     string             `bson:"email"`
 	ImageUrl  string             `bson:"image_url"`
 	CreatedAt primitive.DateTime `bson:"created_at,omitempty"`
@@ -26,9 +27,12 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
-			Type: graphql.String,
+			Type: graphql.ID,
 		},
 		"username": &graphql.Field{
+			Type: graphql.String,
+		},
+		"nickname": &graphql.Field{
 			Type: graphql.String,
 		},
 		"email": &graphql.Field{
@@ -58,6 +62,10 @@ func NewUserResolver(lc fx.Lifecycle, mongodb *mongo.Database) *UserResolver {
 					Options: options.Index().SetUnique(true),
 				},
 				{
+					Keys:    bson.D{{Key: "nickname", Value: -1}},
+					Options: options.Index().SetUnique(true),
+				},
+				{
 					Keys:    bson.D{{Key: "email", Value: -1}},
 					Options: options.Index().SetUnique(true),
 				},
@@ -79,8 +87,8 @@ func (g *UserResolver) GetSchemas() GraphQLResolverSchema {
 	return GraphQLResolverSchema{
 		Mutation: graphql.Fields{
 			"createUser": &graphql.Field{
-				Type:        userType,
-				Description: "내 정보",
+				Type:        graphql.Boolean,
+				Description: "사용자 생성",
 				Args: graphql.FieldConfigArgument{
 					"input": &graphql.ArgumentConfig{
 						Type: createUserInputType,
@@ -98,11 +106,14 @@ func (g *UserResolver) create(p graphql.ResolveParams) (interface{}, error) {
 	_, err := g.mongo.InsertOne(p.Context, User{
 		Username:  input["username"].(string),
 		Password:  input["password"].(string),
+		Nickname:  input["nickname"].(string),
+		Email:     input["email"].(string),
+		ImageUrl:  input["imageUrl"].(string),
 		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
 	})
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	return nil, nil
+	return true, nil
 }
