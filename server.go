@@ -7,7 +7,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/goccy/go-json"
+	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -16,6 +19,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/storage/redis/v2"
 	"go.uber.org/fx"
+	"revil.dev-servers/graph"
 )
 
 func NewHttpServer(lc fx.Lifecycle, config *Config, gql *GraphQL) (*fiber.App, error) {
@@ -55,6 +59,11 @@ func NewHttpServer(lc fx.Lifecycle, config *Config, gql *GraphQL) (*fiber.App, e
 		}),
 	}))
 	server.Use(requestid.New())
+
+	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+
+	server.Post("/gql", adaptor.HTTPHandlerFunc(h.ServeHTTP))
+	server.Get("/", adaptor.HTTPHandlerFunc(playground.Handler("revil.dev GraphQL", "/gql")))
 
 	err := gql.addHttpHandlers(server)
 	if err != nil {

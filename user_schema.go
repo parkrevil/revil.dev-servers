@@ -19,7 +19,7 @@ var createUserInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 			Description: "사용자 닉네임",
 		},
 		"email": &graphql.InputObjectFieldConfig{
-			Type:        graphql.NewNonNull(graphql.NewScalar()),
+			Type:        graphql.NewNonNull(graphql.String),
 			Description: "사용자 이메일",
 		},
 		"imageUrl": &graphql.InputObjectFieldConfig{
