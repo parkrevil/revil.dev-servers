@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+	"revil.dev-servers/graph/resolver"
 )
 
 func main() {
@@ -11,11 +12,10 @@ func main() {
 		fx.Provide(
 			NewConfig,
 			NewMongoDB,
-			NewGraphQL,
 			NewUserResolver,
-			NewGgabongResolver,
 			zap.NewProduction,
 			NewHttpServer,
+			resolver.NewResolver,
 		),
 		fx.Invoke(func(*fiber.App) {}),
 	).Run()

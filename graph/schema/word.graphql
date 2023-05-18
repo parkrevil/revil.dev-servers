@@ -1,0 +1,11 @@
+type Word {
+  id: ID!
+  name: String!
+  definition: String!
+  createdAt: Time!
+  tags: [Tag]!
+}
+
+extend type Query {
+  words: [Word]!
+}

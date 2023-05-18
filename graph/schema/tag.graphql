@@ -1,0 +1,10 @@
+type Tag {
+  id: ID!
+  name: String!
+  description: String!
+  createdAt: Time!
+}
+
+extend type Query {
+  tags: [Tag]!
+}

@@ -2,19 +2,44 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"time"
+)
+
+type CreateUserInput struct {
+	Username        string  `json:"username"`
+	Password        string  `json:"password"`
+	ConfirmPassword string  `json:"confirmPassword"`
+	Nickname        string  `json:"nickname"`
+	Email           *string `json:"email,omitempty"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type Document struct {
+	ID        string    `json:"id"`
+	Subject   string    `json:"subject"`
+	Tags      []*Tag    `json:"tags"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type Tag struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID        string    `json:"id"`
+	Username  string    `json:"username"`
+	Nickname  string    `json:"nickname"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type Word struct {
+	ID         string    `json:"id"`
+	Name       string    `json:"name"`
+	Definition string    `json:"definition"`
+	CreatedAt  time.Time `json:"createdAt"`
+	Tags       []*Tag    `json:"tags"`
 }

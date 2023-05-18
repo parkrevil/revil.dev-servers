@@ -20,9 +20,10 @@ import (
 	"github.com/gofiber/storage/redis/v2"
 	"go.uber.org/fx"
 	"revil.dev-servers/graph"
+	"revil.dev-servers/graph/resolver"
 )
 
-func NewHttpServer(lc fx.Lifecycle, config *Config, gql *GraphQL) (*fiber.App, error) {
+func NewHttpServer(lc fx.Lifecycle, config *Config) (*fiber.App, error) {
 	server := fiber.New(fiber.Config{
 		AppName:       "revil.dev",
 		Immutable:     true,
@@ -60,7 +61,7 @@ func NewHttpServer(lc fx.Lifecycle, config *Config, gql *GraphQL) (*fiber.App, e
 	}))
 	server.Use(requestid.New())
 
-	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &resolver.Resolver{}}))
 
 	server.Post("/gql", adaptor.HTTPHandlerFunc(h.ServeHTTP))
 	server.Get("/", adaptor.HTTPHandlerFunc(playground.Handler("revil.dev GraphQL", "/gql")))

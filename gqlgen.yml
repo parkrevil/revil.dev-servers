@@ -1,6 +1,6 @@
 # Where are all the schema files located? globs are supported eg  src/**/*.graphqls
 schema:
-  - graph/*.graphqls
+  - graph/schema/*.graphql
 
 # Where should the generated server code go?
 exec:
@@ -20,9 +20,9 @@ model:
 # Where should the resolver implementations go?
 resolver:
   layout: follow-schema
-  dir: graph
-  package: graph
-  filename_template: "{name}.resolvers.go"
+  dir: graph/resolver
+  package: resolver
+  filename_template: "{name}.resolver.go"
   # Optional: turn on to not generate template comments above resolvers
   # omit_template_comment: false
 

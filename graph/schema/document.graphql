@@ -1,0 +1,10 @@
+type Document {
+  id: ID!
+  subject: String!
+  tags: [Tag]!
+  createdAt: Time!
+}
+
+extend type Query {
+  documents: [Document]!
+}
