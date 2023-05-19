@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"crypto/rand"
@@ -18,29 +18,29 @@ const (
 )
 
 type Config struct {
-	env     string
-	server  ServerConfig
-	mongodb MongoDBConfig
-	redis   RedisConfig
+	Env     string
+	Server  ServerConfig
+	MongoDb MongoDBConfig
+	Redis   RedisConfig
 }
 
 type ServerConfig struct {
-	host string
-	port int
+	Host string
+	Port int
 }
 
 type MongoDBConfig struct {
-	uri      string
-	database string
+	Uri      string
+	Database string
 }
 
 type RedisConfig struct {
-	host      string
-	port      int
-	password  string
-	limiterDb int
-	authDb    int
-	cacheDb   int
+	Host      string
+	Port      int
+	Password  string
+	LimiterDb int
+	AuthDb    int
+	CacheDb   int
 }
 
 func NewConfig() (*Config, error) {
@@ -53,7 +53,7 @@ func NewConfig() (*Config, error) {
 		return nil, errors.New("Invalid argument env")
 	}
 
-	if err := godotenv.Load(".env." + env); err != nil {
+	if err := godotenv.Load("../.env." + env); err != nil {
 		return nil, errors.New("Failed to load env file")
 	}
 
@@ -64,22 +64,22 @@ func NewConfig() (*Config, error) {
 	authDb, _ := strconv.Atoi(os.Getenv("REDIS_DB_AUTH"))
 
 	return &Config{
-		env: env,
-		server: ServerConfig{
-			host: os.Getenv("SERVER_HOST"),
-			port: serverPort,
+		Env: env,
+		Server: ServerConfig{
+			Host: os.Getenv("SERVER_HOST"),
+			Port: serverPort,
 		},
-		mongodb: MongoDBConfig{
-			uri:      os.Getenv("MONGODB_URI"),
-			database: os.Getenv("MONGODB_DATABASE"),
+		MongoDb: MongoDBConfig{
+			Uri:      os.Getenv("MONGODB_URI"),
+			Database: os.Getenv("MONGODB_DATABASE"),
 		},
-		redis: RedisConfig{
-			host:      os.Getenv("REDIS_HOST"),
-			port:      redisPort,
-			password:  os.Getenv("REDIS_PASSWORD"),
-			limiterDb: limiterDb,
-			authDb:    authDb,
-			cacheDb:   cacheDb,
+		Redis: RedisConfig{
+			Host:      os.Getenv("REDIS_HOST"),
+			Port:      redisPort,
+			Password:  os.Getenv("REDIS_PASSWORD"),
+			LimiterDb: limiterDb,
+			AuthDb:    authDb,
+			CacheDb:   cacheDb,
 		},
 	}, nil
 }

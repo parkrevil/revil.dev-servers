@@ -17,6 +17,7 @@ type CreateUserInput struct {
 type Document struct {
 	ID        string    `json:"id"`
 	Subject   string    `json:"subject"`
+	Creator   *User     `json:"creator"`
 	Tags      []*Tag    `json:"tags"`
 	CreatedAt time.Time `json:"createdAt"`
 }
@@ -25,6 +26,7 @@ type Tag struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	Creator     *User     `json:"creator"`
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
@@ -40,6 +42,7 @@ type Word struct {
 	ID         string    `json:"id"`
 	Name       string    `json:"name"`
 	Definition string    `json:"definition"`
-	CreatedAt  time.Time `json:"createdAt"`
+	Creator    *User     `json:"creator"`
 	Tags       []*Tag    `json:"tags"`
+	CreatedAt  time.Time `json:"createdAt"`
 }

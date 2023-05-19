@@ -7,29 +7,13 @@ package resolver
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"revil.dev-servers/graph"
-	"revil.dev-servers/graph/model"
+	"revil.dev-servers/gateway/graph"
+	"revil.dev-servers/gateway/graph/model"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (bool, error) {
-	_, err := r.mongo.InsertOne(p.Context, User{
-		Username:  input["username"].(string),
-		Password:  input["password"].(string),
-		Nickname:  input["nickname"].(string),
-		Email:     input["email"].(string),
-		ImageUrl:  input["imageUrl"].(string),
-		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
-	})
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
-
 	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
 }
 

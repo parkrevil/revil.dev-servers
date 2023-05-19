@@ -2,8 +2,9 @@ type Word {
   id: ID!
   name: String!
   definition: String!
-  createdAt: Time!
+  creator: User!
   tags: [Tag]!
+  createdAt: Time!
 }
 
 extend type Query {

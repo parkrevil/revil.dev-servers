@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 
-	"revil.dev-servers/graph/model"
+	"revil.dev-servers/gateway/graph/model"
 )
 
 // Words is the resolver for the words field.

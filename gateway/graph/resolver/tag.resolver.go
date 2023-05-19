@@ -8,10 +8,10 @@ import (
 	"context"
 	"fmt"
 
-	"revil.dev-servers/graph/model"
+	"revil.dev-servers/gateway/graph/model"
 )
 
-// Documents is the resolver for the documents field.
-func (r *queryResolver) Documents(ctx context.Context) ([]*model.Document, error) {
-	panic(fmt.Errorf("not implemented: Documents - documents"))
+// Tags is the resolver for the tags field.
+func (r *queryResolver) Tags(ctx context.Context) ([]*model.Tag, error) {
+	panic(fmt.Errorf("not implemented: Tags - tags"))
 }

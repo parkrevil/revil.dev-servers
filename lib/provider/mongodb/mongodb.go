@@ -1,4 +1,4 @@
-package main
+package mongodb
 
 import (
 	"context"
@@ -8,10 +8,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/fx"
+	"revil.dev-servers/lib"
 )
 
-func NewMongoDB(lc fx.Lifecycle, config *Config) (*mongo.Database, error) {
-	options := options.Client().ApplyURI(config.mongodb.uri)
+func NewMongoDB(lc fx.Lifecycle, config *lib.Config) (*mongo.Database, error) {
+	options := options.Client().ApplyURI(config.MongoDb.Uri)
 	options.SetMaxPoolSize(100)
 	options.SetMinPoolSize(10)
 	options.SetMaxConnIdleTime(10 * time.Second)
@@ -31,5 +32,5 @@ func NewMongoDB(lc fx.Lifecycle, config *Config) (*mongo.Database, error) {
 		},
 	})
 
-	return client.Database(config.mongodb.database), nil
+	return client.Database(config.MongoDb.Database), nil
 }

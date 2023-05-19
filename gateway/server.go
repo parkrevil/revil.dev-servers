@@ -19,11 +19,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/storage/redis/v2"
 	"go.uber.org/fx"
-	"revil.dev-servers/graph"
-	"revil.dev-servers/graph/resolver"
+
+	"revil.dev-servers/gateway/graph"
+	"revil.dev-servers/gateway/graph/resolver"
+	"revil.dev-servers/lib"
 )
 
-func NewHttpServer(lc fx.Lifecycle, config *Config) (*fiber.App, error) {
+func NewHttpServer(lc fx.Lifecycle, config *lib.Config) (*fiber.App, error) {
 	server := fiber.New(fiber.Config{
 		AppName:       "revil.dev",
 		Immutable:     true,
@@ -50,10 +52,10 @@ func NewHttpServer(lc fx.Lifecycle, config *Config) (*fiber.App, error) {
 		Expiration:        10 * time.Second,
 		LimiterMiddleware: limiter.SlidingWindow{},
 		Storage: redis.New(redis.Config{
-			Host:      config.redis.host,
-			Port:      config.redis.port,
-			Password:  config.redis.password,
-			Database:  config.redis.limiterDb,
+			Host:      config.Redis.Host,
+			Port:      config.Redis.Port,
+			Password:  config.Redis.Password,
+			Database:  config.Redis.LimiterDb,
 			Reset:     false,
 			TLSConfig: nil,
 			PoolSize:  10 * runtime.GOMAXPROCS(0),
@@ -66,14 +68,9 @@ func NewHttpServer(lc fx.Lifecycle, config *Config) (*fiber.App, error) {
 	server.Post("/gql", adaptor.HTTPHandlerFunc(h.ServeHTTP))
 	server.Get("/", adaptor.HTTPHandlerFunc(playground.Handler("revil.dev GraphQL", "/gql")))
 
-	err := gql.addHttpHandlers(server)
-	if err != nil {
-		return nil, err
-	}
-
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			go server.Listen(config.server.host + ":" + strconv.Itoa(config.server.port))
+			go server.Listen(config.Server.Host + ":" + strconv.Itoa(config.Server.Port))
 
 			return nil
 		},

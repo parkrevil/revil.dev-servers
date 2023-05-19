@@ -17,7 +17,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
-	"revil.dev-servers/graph/model"
+	"revil.dev-servers/gateway/graph/model"
 )
 
 // region    ************************** generated!.gotpl **************************
@@ -48,6 +48,7 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Document struct {
 		CreatedAt func(childComplexity int) int
+		Creator   func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Subject   func(childComplexity int) int
 		Tags      func(childComplexity int) int
@@ -67,6 +68,7 @@ type ComplexityRoot struct {
 
 	Tag struct {
 		CreatedAt   func(childComplexity int) int
+		Creator     func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
@@ -82,6 +84,7 @@ type ComplexityRoot struct {
 
 	Word struct {
 		CreatedAt  func(childComplexity int) int
+		Creator    func(childComplexity int) int
 		Definition func(childComplexity int) int
 		ID         func(childComplexity int) int
 		Name       func(childComplexity int) int
@@ -121,6 +124,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Document.CreatedAt(childComplexity), true
+
+	case "Document.creator":
+		if e.complexity.Document.Creator == nil {
+			break
+		}
+
+		return e.complexity.Document.Creator(childComplexity), true
 
 	case "Document.id":
 		if e.complexity.Document.ID == nil {
@@ -197,6 +207,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tag.CreatedAt(childComplexity), true
 
+	case "Tag.creator":
+		if e.complexity.Tag.Creator == nil {
+			break
+		}
+
+		return e.complexity.Tag.Creator(childComplexity), true
+
 	case "Tag.description":
 		if e.complexity.Tag.Description == nil {
 			break
@@ -259,6 +276,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Word.CreatedAt(childComplexity), true
+
+	case "Word.creator":
+		if e.complexity.Word.Creator == nil {
+			break
+		}
+
+		return e.complexity.Word.Creator(childComplexity), true
 
 	case "Word.definition":
 		if e.complexity.Word.Definition == nil {
@@ -386,7 +410,7 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	var arg0 model.CreateUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateUserInput2revilᚗdevᚑserversᚋgraphᚋmodelᚐCreateUserInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateUserInput2revilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐCreateUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -536,6 +560,62 @@ func (ec *executionContext) fieldContext_Document_subject(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Document_creator(ctx context.Context, field graphql.CollectedField, obj *model.Document) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Document_creator(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Creator, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Document_creator(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Document",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "nickname":
+				return ec.fieldContext_User_nickname(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Document_tags(ctx context.Context, field graphql.CollectedField, obj *model.Document) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Document_tags(ctx, field)
 	if err != nil {
@@ -564,7 +644,7 @@ func (ec *executionContext) _Document_tags(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.Tag)
 	fc.Result = res
-	return ec.marshalNTag2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐTag(ctx, field.Selections, res)
+	return ec.marshalNTag2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐTag(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Document_tags(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -581,6 +661,8 @@ func (ec *executionContext) fieldContext_Document_tags(ctx context.Context, fiel
 				return ec.fieldContext_Tag_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Tag_description(ctx, field)
+			case "creator":
+				return ec.fieldContext_Tag_creator(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Tag_createdAt(ctx, field)
 			}
@@ -714,7 +796,7 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalOUser2ᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -770,7 +852,7 @@ func (ec *executionContext) _Query_documents(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.Document)
 	fc.Result = res
-	return ec.marshalNDocument2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐDocument(ctx, field.Selections, res)
+	return ec.marshalNDocument2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐDocument(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_documents(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -785,6 +867,8 @@ func (ec *executionContext) fieldContext_Query_documents(ctx context.Context, fi
 				return ec.fieldContext_Document_id(ctx, field)
 			case "subject":
 				return ec.fieldContext_Document_subject(ctx, field)
+			case "creator":
+				return ec.fieldContext_Document_creator(ctx, field)
 			case "tags":
 				return ec.fieldContext_Document_tags(ctx, field)
 			case "createdAt":
@@ -824,7 +908,7 @@ func (ec *executionContext) _Query_tags(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.([]*model.Tag)
 	fc.Result = res
-	return ec.marshalNTag2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐTag(ctx, field.Selections, res)
+	return ec.marshalNTag2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐTag(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_tags(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -841,6 +925,8 @@ func (ec *executionContext) fieldContext_Query_tags(ctx context.Context, field g
 				return ec.fieldContext_Tag_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Tag_description(ctx, field)
+			case "creator":
+				return ec.fieldContext_Tag_creator(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Tag_createdAt(ctx, field)
 			}
@@ -878,7 +964,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_users(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -934,7 +1020,7 @@ func (ec *executionContext) _Query_words(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.Word)
 	fc.Result = res
-	return ec.marshalNWord2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐWord(ctx, field.Selections, res)
+	return ec.marshalNWord2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐWord(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_words(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -951,10 +1037,12 @@ func (ec *executionContext) fieldContext_Query_words(ctx context.Context, field 
 				return ec.fieldContext_Word_name(ctx, field)
 			case "definition":
 				return ec.fieldContext_Word_definition(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Word_createdAt(ctx, field)
+			case "creator":
+				return ec.fieldContext_Word_creator(ctx, field)
 			case "tags":
 				return ec.fieldContext_Word_tags(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Word_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Word", field.Name)
 		},
@@ -1218,6 +1306,62 @@ func (ec *executionContext) fieldContext_Tag_description(ctx context.Context, fi
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Tag_creator(ctx context.Context, field graphql.CollectedField, obj *model.Tag) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tag_creator(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Creator, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tag_creator(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tag",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "nickname":
+				return ec.fieldContext_User_nickname(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -1619,6 +1763,118 @@ func (ec *executionContext) fieldContext_Word_definition(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Word_creator(ctx context.Context, field graphql.CollectedField, obj *model.Word) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Word_creator(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Creator, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Word_creator(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Word",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "nickname":
+				return ec.fieldContext_User_nickname(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Word_tags(ctx context.Context, field graphql.CollectedField, obj *model.Word) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Word_tags(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tags, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tag)
+	fc.Result = res
+	return ec.marshalNTag2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐTag(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Word_tags(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Word",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Tag_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Tag_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Tag_description(ctx, field)
+			case "creator":
+				return ec.fieldContext_Tag_creator(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Tag_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Tag", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Word_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Word) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Word_createdAt(ctx, field)
 	if err != nil {
@@ -1658,60 +1914,6 @@ func (ec *executionContext) fieldContext_Word_createdAt(ctx context.Context, fie
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Word_tags(ctx context.Context, field graphql.CollectedField, obj *model.Word) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Word_tags(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Tags, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Tag)
-	fc.Result = res
-	return ec.marshalNTag2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐTag(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Word_tags(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Word",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Tag_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Tag_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Tag_description(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Tag_createdAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Tag", field.Name)
 		},
 	}
 	return fc, nil
@@ -3587,6 +3789,13 @@ func (ec *executionContext) _Document(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "creator":
+
+			out.Values[i] = ec._Document_creator(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "tags":
 
 			out.Values[i] = ec._Document_tags(ctx, field, obj)
@@ -3836,6 +4045,13 @@ func (ec *executionContext) _Tag(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "creator":
+
+			out.Values[i] = ec._Tag_creator(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createdAt":
 
 			out.Values[i] = ec._Tag_createdAt(ctx, field, obj)
@@ -3941,9 +4157,9 @@ func (ec *executionContext) _Word(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "createdAt":
+		case "creator":
 
-			out.Values[i] = ec._Word_createdAt(ctx, field, obj)
+			out.Values[i] = ec._Word_creator(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3951,6 +4167,13 @@ func (ec *executionContext) _Word(ctx context.Context, sel ast.SelectionSet, obj
 		case "tags":
 
 			out.Values[i] = ec._Word_tags(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+
+			out.Values[i] = ec._Word_createdAt(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -4299,12 +4522,12 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNCreateUserInput2revilᚗdevᚑserversᚋgraphᚋmodelᚐCreateUserInput(ctx context.Context, v interface{}) (model.CreateUserInput, error) {
+func (ec *executionContext) unmarshalNCreateUserInput2revilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐCreateUserInput(ctx context.Context, v interface{}) (model.CreateUserInput, error) {
 	res, err := ec.unmarshalInputCreateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNDocument2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐDocument(ctx context.Context, sel ast.SelectionSet, v []*model.Document) graphql.Marshaler {
+func (ec *executionContext) marshalNDocument2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐDocument(ctx context.Context, sel ast.SelectionSet, v []*model.Document) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4328,7 +4551,7 @@ func (ec *executionContext) marshalNDocument2ᚕᚖrevilᚗdevᚑserversᚋgraph
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalODocument2ᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐDocument(ctx, sel, v[i])
+			ret[i] = ec.marshalODocument2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐDocument(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4372,7 +4595,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNTag2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐTag(ctx context.Context, sel ast.SelectionSet, v []*model.Tag) graphql.Marshaler {
+func (ec *executionContext) marshalNTag2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐTag(ctx context.Context, sel ast.SelectionSet, v []*model.Tag) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4396,7 +4619,7 @@ func (ec *executionContext) marshalNTag2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOTag2ᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐTag(ctx, sel, v[i])
+			ret[i] = ec.marshalOTag2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐTag(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4425,7 +4648,7 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4449,7 +4672,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋm
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOUser2ᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalOUser2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4463,7 +4686,17 @@ func (ec *executionContext) marshalNUser2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋm
 	return ret
 }
 
-func (ec *executionContext) marshalNWord2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐWord(ctx context.Context, sel ast.SelectionSet, v []*model.Word) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWord2ᚕᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐWord(ctx context.Context, sel ast.SelectionSet, v []*model.Word) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4487,7 +4720,7 @@ func (ec *executionContext) marshalNWord2ᚕᚖrevilᚗdevᚑserversᚋgraphᚋm
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOWord2ᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐWord(ctx, sel, v[i])
+			ret[i] = ec.marshalOWord2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐWord(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4780,7 +5013,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalODocument2ᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐDocument(ctx context.Context, sel ast.SelectionSet, v *model.Document) graphql.Marshaler {
+func (ec *executionContext) marshalODocument2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐDocument(ctx context.Context, sel ast.SelectionSet, v *model.Document) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4803,21 +5036,21 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalOTag2ᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐTag(ctx context.Context, sel ast.SelectionSet, v *model.Tag) graphql.Marshaler {
+func (ec *executionContext) marshalOTag2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐTag(ctx context.Context, sel ast.SelectionSet, v *model.Tag) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Tag(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOUser2ᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOWord2ᚖrevilᚗdevᚑserversᚋgraphᚋmodelᚐWord(ctx context.Context, sel ast.SelectionSet, v *model.Word) graphql.Marshaler {
+func (ec *executionContext) marshalOWord2ᚖrevilᚗdevᚑserversᚋgatewayᚋgraphᚋmodelᚐWord(ctx context.Context, sel ast.SelectionSet, v *model.Word) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

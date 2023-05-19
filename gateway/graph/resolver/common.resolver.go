@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
-	"revil.dev-servers/graph"
-	"revil.dev-servers/graph/model"
+	"revil.dev-servers/gateway/graph"
+	"revil.dev-servers/gateway/graph/model"
 )
 
 // Me is the resolver for the me field.
