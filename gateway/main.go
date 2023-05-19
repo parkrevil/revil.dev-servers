@@ -5,6 +5,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"revil.dev-servers/gateway/graph/resolver"
+	"revil.dev-servers/gateway/user"
 	"revil.dev-servers/lib"
 	"revil.dev-servers/lib/provider/mongodb"
 )
@@ -17,6 +18,7 @@ func main() {
 			zap.NewProduction,
 			NewHttpServer,
 			resolver.NewResolver,
+			user.NewUserService,
 		),
 		fx.Invoke(func(*fiber.App) {}),
 	).Run()

@@ -2,12 +2,16 @@
 
 package resolver
 
-// This file will not be regenerated automatically.
-//
-// It serves as dependency injection for your app, add any dependencies you require here.
+import (
+	"revil.dev-servers/gateway/user"
+)
 
-type Resolver struct{}
+type Resolver struct {
+	userService *user.UserService
+}
 
-func NewResolver() *Resolver {
-	return &Resolver{}
+func NewResolver(userService *user.UserService) *Resolver {
+	return &Resolver{
+		userService: userService,
+	}
 }
