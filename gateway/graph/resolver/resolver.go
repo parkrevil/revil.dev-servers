@@ -3,15 +3,16 @@
 package resolver
 
 import (
-	"revil.dev-servers/gateway/user"
+// "revil.dev-servers/gateway/user"
 )
 
 type Resolver struct {
-	userService *user.UserService
+	//userService *user.UserService
 }
 
-func NewResolver(userService *user.UserService) *Resolver {
+// userService *user.UserService
+func NewResolver() *Resolver {
 	return &Resolver{
-		userService: userService,
+		//userService: userService,
 	}
 }
