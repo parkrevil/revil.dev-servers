@@ -1,4 +1,4 @@
-package user
+package main
 
 type UserService struct {
 	userRepo *userRepo

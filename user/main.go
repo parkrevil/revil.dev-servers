@@ -1,15 +1,12 @@
 package main
 
 import (
-	"log"
-	"net"
-	"os"
-	"os/signal"
+	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"revil.dev-servers/lib"
+	"revil.dev-servers/lib/provider/mongodb"
 	//	pb "revil.dev-servers/libs/services/article"
-
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -18,8 +15,8 @@ func main() {
 			lib.NewConfig,
 			mongodb.NewMongoDB,
 			zap.NewProduction,
-		//	NewServer,
-		//		user.NewUserService,
+			NewServer,
+			NewUserService,
 		),
 		fx.Invoke(func() {}),
 	).Run()
