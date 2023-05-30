@@ -1,44 +1,47 @@
 package main
 
 import (
+	"context"
 	"net"
+	"strconv"
+
+	"go.uber.org/fx"
+	"google.golang.org/grpc"
+	"revil.dev-servers/lib"
+	pb "revil.dev-servers/lib/service/user"
 
 	"go.uber.org/zap"
 )
 
-func NewServer(lc fx.Lifecycle, config *lib.Config, log *zap.Logger) (*fiber.App, error) {
-	sugar := logger.Sugar()
-	l, err := net.Listen("tcp", config.UserServer.Port)
-
+func NewServer(lc fx.Lifecycle, config *lib.Config, logger *zap.Logger, userService *UserService) (*grpc.Server, error) {
+	listenAddress := config.UserGrpcServer.Host + ":" + strconv.Itoa(config.UserGrpcServer.Port)
+	l, err := net.Listen("tcp", listenAddress)
 	if err != nil {
-		sugar.Error("Failed to listen user server", err)
+		logger.Error("Failed to listen user server", zap.Error(err))
 	}
 
 	server := grpc.NewServer()
 
-	pb.RegisterArticleServiceServer(server, NewArticleService())
-	pb.RegisterArticlePageServiceServer(server, &ArticlePageService{})
+	pb.RegisterUserServiceServer(server, userService)
 
 	if err := server.Serve(l); err != nil {
-		log.Fatalf("failed to serve slides server: %v", err)
+		logger.Error("failed to serve slides server: %v", zap.Error(err))
 	}
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
-	<-quit
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			go server.Listen(config.Server.Host + ":" + strconv.Itoa(config.Server.Port))
+			if err := server.Serve(l); err != nil {
+				logger.Error("failed to serve user server", zap.Error(err))
+			}
 
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
 			server.GracefulStop()
-			return server.ShutdownWithContext(ctx)
+
+			return nil
 		},
 	})
 
 	return server, nil
-
 }

@@ -18,13 +18,19 @@ const (
 )
 
 type Config struct {
-	Env     string
-	Server  ServerConfig
-	MongoDb MongoDBConfig
-	Redis   RedisConfig
+	Env            string
+	GatewayServer  GatewayServerConfig
+	UserGrpcServer UserGrpcServerConfig
+	MongoDb        MongoDBConfig
+	Redis          RedisConfig
 }
 
-type ServerConfig struct {
+type GatewayServerConfig struct {
+	Host string
+	Port int
+}
+
+type UserGrpcServerConfig struct {
 	Host string
 	Port int
 }
@@ -57,7 +63,8 @@ func NewConfig() (*Config, error) {
 		return nil, errors.New("Failed to load env file")
 	}
 
-	serverPort, _ := strconv.Atoi(os.Getenv("SERVER_PORT"))
+	gatewayServerPort, _ := strconv.Atoi(os.Getenv("GATEWAY_SERVER_PORT"))
+	userGrpcServerPort, _ := strconv.Atoi(os.Getenv("USER_GRPC_SERVER_PORT"))
 	redisPort, _ := strconv.Atoi(os.Getenv("REDIS_PORT"))
 	limiterDb, _ := strconv.Atoi(os.Getenv("REDIS_DB_LIMITER"))
 	cacheDb, _ := strconv.Atoi(os.Getenv("REDIS_DB_CACHE"))
@@ -65,9 +72,13 @@ func NewConfig() (*Config, error) {
 
 	return &Config{
 		Env: env,
-		Server: ServerConfig{
-			Host: os.Getenv("SERVER_HOST"),
-			Port: serverPort,
+		GatewayServer: GatewayServerConfig{
+			Host: os.Getenv("GATEWAY_SERVER_HOST"),
+			Port: gatewayServerPort,
+		},
+		UserGrpcServer: UserGrpcServerConfig{
+			Host: os.Getenv("USER_GRPC_SERVER_HOST"),
+			Port: userGrpcServerPort,
 		},
 		MongoDb: MongoDBConfig{
 			Uri:      os.Getenv("MONGODB_URI"),
