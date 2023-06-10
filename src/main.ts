@@ -1,8 +1,11 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { Settings as LuxonSettings } from 'luxon';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+import { bootstrap } from './bootstrap';
+
+LuxonSettings.defaultZone = 'Asia/Seoul';
+
+async function start() {
+  await bootstrap();
 }
-bootstrap();
+
+start();
