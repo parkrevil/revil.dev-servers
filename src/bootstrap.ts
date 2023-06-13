@@ -7,6 +7,8 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger } from 'nestjs-pino';
+import { v4 as uuidv4 } from 'uuid';
 
 import { ServerConfig } from './core/configs';
 import { ValidationException } from './core/exceptions';
@@ -16,12 +18,16 @@ import { RootModule } from './root.module';
 export const bootstrap = async () => {
   const app = await NestFactory.create<NestFastifyApplication>(
     RootModule,
-    new FastifyAdapter(),
+    new FastifyAdapter({
+      genReqId: () => uuidv4(),
+      requestIdHeader: false,
+    }),
+    {
+      bufferLogs: true,
+    },
   );
-  const serverConfig = app.get(ConfigService).get<ServerConfig>('server');
 
-  await app.register(compression);
-  app.enableCors(serverConfig.cors);
+  app.useLogger(app.get(Logger));
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -37,6 +43,11 @@ export const bootstrap = async () => {
       },
     }),
   );
+
+  const serverConfig = app.get(ConfigService).get<ServerConfig>('server');
+
+  await app.register(compression);
+  app.enableCors(serverConfig.cors);
 
   if (isLocal()) {
     const apiDoc = new DocumentBuilder()
