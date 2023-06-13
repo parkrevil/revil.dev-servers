@@ -19,20 +19,6 @@ import { UserModule } from './user/user.module';
         return Object.assign(config, {
           namingStrategy: new SnakeNamingStrategy(),
           autoLoadEntities: true,
-          extra: {
-            /*             typeCast: (field, next) => {
-              const { type } = field;
-
-              if (type === 'DATE' || type === 'DATETIME') {
-                const val = field.string();
-
-                return val === null ? null : DateTime.fromSQL(val);
-              } else {
-                return next();
-              }
-            },
- */
-          },
         });
       },
       inject: [ConfigService],

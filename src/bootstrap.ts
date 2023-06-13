@@ -1,4 +1,5 @@
 import compression from '@fastify/compress';
+import { ValidationError, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import {
@@ -8,6 +9,7 @@ import {
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { ServerConfig } from './core/configs';
+import { ValidationException } from './core/exceptions';
 import { isLocal } from './core/helpers';
 import { RootModule } from './root.module';
 
@@ -18,8 +20,23 @@ export const bootstrap = async () => {
   );
   const serverConfig = app.get(ConfigService).get<ServerConfig>('server');
 
-  app.enableCors(serverConfig.cors);
   await app.register(compression);
+  app.enableCors(serverConfig.cors);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      dismissDefaultMessages: true,
+      validationError: {
+        target: true,
+        value: false,
+      },
+      forbidUnknownValues: true,
+      stopAtFirstError: true,
+      exceptionFactory: (errors: ValidationError[]) => {
+        return new ValidationException();
+      },
+    }),
+  );
 
   if (isLocal()) {
     const apiDoc = new DocumentBuilder()

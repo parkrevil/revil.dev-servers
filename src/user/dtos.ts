@@ -1,14 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsEmail, IsString } from 'class-validator';
 
-export class CreateUserDto {
+class UserDto {
   @ApiProperty({
     format: 'email',
     description: '아이디',
   })
   @IsEmail()
   username: string;
+}
 
+export class HasUsernameQuery extends PickType(UserDto, ['username']) {}
+
+export class CreateUserDto extends PickType(UserDto, ['username']) {
   @ApiProperty({
     description: '비밀번호',
   })
