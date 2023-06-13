@@ -1,19 +1,23 @@
+import compression from '@fastify/compress';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import compression from '@fastify/compress';
-import { ConfigService } from '@nestjs/config';
-import { RootModule } from './root.module';
-import { ServerConfig } from './core/configs';
-import { isLocal } from './core/helpers';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import { ServerConfig } from './core/configs';
+import { isLocal } from './core/helpers';
+import { RootModule } from './root.module';
+
 export const bootstrap = async () => {
-  const app = await NestFactory.create<NestFastifyApplication>(RootModule, new FastifyAdapter());
+  const app = await NestFactory.create<NestFastifyApplication>(
+    RootModule,
+    new FastifyAdapter(),
+  );
   const serverConfig = app.get(ConfigService).get<ServerConfig>('server');
-  
+
   app.enableCors(serverConfig.cors);
   await app.register(compression);
 
@@ -35,4 +39,4 @@ export const bootstrap = async () => {
   }
 
   await app.listen(serverConfig.listen.port, serverConfig.listen.host);
-}
+};

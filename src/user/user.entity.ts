@@ -1,6 +1,13 @@
-import { DateTimeTypeTransformer } from '@/core/providers/typeorm/transformers';
 import { DateTime } from 'luxon';
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+import { DateTimeTypeTransformer } from '@/core/providers/typeorm/transformers';
 
 @Entity()
 export class User {

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { configs } from './core/configs';
-import { UserModule } from './user/user.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { DateTime } from 'luxon';
+
+import { configs } from './core/configs';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { DateTime } from 'luxon';
           namingStrategy: new SnakeNamingStrategy(),
           autoLoadEntities: true,
           extra: {
-/*             typeCast: (field, next) => {
+            /*             typeCast: (field, next) => {
               const { type } = field;
 
               if (type === 'DATE' || type === 'DATETIME') {
@@ -31,7 +31,8 @@ import { DateTime } from 'luxon';
                 return next();
               }
             },
- */          },
+ */
+          },
         });
       },
       inject: [ConfigService],

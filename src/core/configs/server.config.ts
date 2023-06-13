@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 
-import { ServerConfig } from './interfaces';
 import { Env } from '../enums';
+import { ServerConfig } from './interfaces';
 
 export default registerAs(
   'server',
@@ -20,7 +20,10 @@ export default registerAs(
       exposedHeaders: process.env.CORS_EXPOSED_HEADERS.split(','),
       preflightContinue: process.env.CORS_PREFLIGHT_CONTINUE === 'true',
       credentials: process.env.CORS_CREDENTIALS === 'true',
-      optionsSuccessStatus: parseInt(process.env.CORS_OPTIONS_SUCCESS_STATUS, 10),
+      optionsSuccessStatus: parseInt(
+        process.env.CORS_OPTIONS_SUCCESS_STATUS,
+        10,
+      ),
     },
   }),
 );
