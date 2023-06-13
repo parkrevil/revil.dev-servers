@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongoConfig, configs } from './core/configs';
+import { configs } from './core/configs';
 import { UserModule } from './user/user.module';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { DateTime } from 'luxon';
 
 @Module({
   imports: [
@@ -10,14 +12,27 @@ import { MongooseModule } from '@nestjs/mongoose';
       isGlobal: true,
       load: configs,
     }),
-    MongooseModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
-        const config = configService.get<MongoConfig>('mongo');
+        const config = configService.get<TypeOrmModuleOptions>('typeorm');
 
-        return {
-          uri: config.uri,
-          dbName: config.db,
-        };
+        return Object.assign(config, {
+          namingStrategy: new SnakeNamingStrategy(),
+          autoLoadEntities: true,
+          extra: {
+/*             typeCast: (field, next) => {
+              const { type } = field;
+
+              if (type === 'DATE' || type === 'DATETIME') {
+                const val = field.string();
+
+                return val === null ? null : DateTime.fromSQL(val);
+              } else {
+                return next();
+              }
+            },
+ */          },
+        });
       },
       inject: [ConfigService],
     }),

@@ -9,8 +9,3 @@ export interface ServerConfig {
   };
   cors: CorsOptions;
 }
-
-export interface MongoConfig {
-  uri: string;
-  db: string;
-}

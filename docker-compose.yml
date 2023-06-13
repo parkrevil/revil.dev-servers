@@ -1,31 +1,22 @@
 version: '3'
 
 services:
-  revil.dev_mongodb:
-    container_name: revil.dev_mongodb
-    image: mongo
+  revil.dev_mysql:
+    container_name: revil.dev_mysql
+    image: mysql
     restart: always
     ports:
-      - 27017:27017
+      - 3336:3306
     volumes:
       - ./.container-volumes/mongodb/data/db:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: 1234
-      MONGO_INITDB_DATABASE: revil.dev
-
-  revil.dev_mongo-express:
-    container_name: revil.dev_mongo-express
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: 1234
-      ME_CONFIG_MONGODB_URL: mongodb://root:1234@revil.dev_mongodb:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: root
-      ME_CONFIG_BASICAUTH_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: revildev
+      TZ: Asia/Seoul
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
 
   revil.dev_redis:
     container_name: revil.dev_redis
